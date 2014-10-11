@@ -1,0 +1,634 @@
+<div id="el-loaded-content">
+    <div class="col-xs-12">
+        <div class="input-group object-name">
+            <input type=text id="objname" class="form-control" placeholder="Имя группы" autofocus>
+            <span class="input-group-addon">
+                <input type="checkbox" id="enabled"> Вкл.
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="extensions">
+                <div class="panel-header">Назначение внутренних номеров
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="selectable-cont">
+                        <div class="selectable-box selectable-ext">
+                            <p>Доступные</p>             
+                            <ul id="available"></ul>
+                        </div>
+                        <div>
+                            <span class="glyphicon glyphicon-transfer"></span>
+                        </div>
+                        <div class="selectable-box selectable-ext">
+                            <p>Назначенные</p>
+                            <ul id="members" class="el-sortable"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="equipment">
+                <div class="panel-header">Тип оборудования
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="equipment" id="ipphones" value="ipphones"> IP Телефон
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="equipment" id="gateway" value="gateway"> VoIP Шлюз
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="regname" class="col-sm-2">Логин</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="gateway" id="regname" placeholder="Логин">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="regpass" class="col-sm-2">Пароль</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" name="gateway" id="regpass" placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="equipment" id="trunk" value="trunk"> VoIP Транк
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address" class="col-sm-2">Домен</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="trunk" id="address" placeholder="Домен">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="username" class="col-sm-2">Логин</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" name="trunk" id="username" placeholder="Логин">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="col-sm-2">Пароль</label>
+                            <div class="col-sm-10">
+                                <input type="password" class="form-control" name="trunk" id="password" placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="starflash" checked> Использовать * как кнопку flash
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-2">
+                                <input type="text" class="form-control" id="phonelines" value="1">
+                            </div>
+                            <label for="phonelines" class="col-sm-8">Количество линий на телефон</label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="unit">
+                <div class="panel-header">Настройки группы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">    
+                            <label for="groupno1" class="col-sm-4">Группа перехвата вызова</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="groupno1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="timeout1" class="col-sm-4">Время дозвона номера</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="timeout1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-sm-4">Режим поиска свободного номера</label>
+                            <div class="col-sm-4">
+                                <select id="huntmode1" class="form-control">
+                                    <option value="0">отключен</option>
+                                    <option value="1">цикличный</option>
+                                    <option value="2">один круг</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="huntfwd1"> Разрешить переадресацию с внутреннего номера
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="hunting">
+                <div class="panel-header">Настройки группы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="timeout2" class="col-sm-4">Таймаут поиска по номеру</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="timeout2">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="huntmode2" class="col-sm-4">Тип поиска по номеру</label>
+                            <div class="col-sm-3">
+                                <select id="huntmode2" class="form-control">
+                                    <option value="0">последовательный</option>
+                                    <option value="1">параллельный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="huntfwd2"> Разрешить переадресацию с внутреннего номера
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom" >
+            <div class="panel" id="pickup">
+                <div class="panel-header">Настройки группы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">    
+                            <label for="groupno2" class="col-sm-4">Номер группы для функции перехвата вызова</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="groupno2">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="icd">
+                <div class="panel-header">Настройки группы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="groupno" class="col-sm-4">Номер группы</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="groupno">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxlines" class="col-sm-4">Макс. кол-во линий</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="maxlines">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="priority" class="col-sm-4">Приоритет</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="priority">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="canpickup"> Включить функцию Pickup
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="autologin"> Авторегистрация
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div id="users">
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="conference">
+                <div class="panel-header">Настройки соединения
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="dialuptt" class="col-sm-4">Таймаут дозвона</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="dialuptt">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="autoredial"> Перенабирать занятый номер 
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="playgreet"> Проигрывать приветствие
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="greeting2" class="col-sm-4">Файл приветствия:</label>
+                            <div class="col-sm-8">
+                                <input type="file" id="greeting2" class="upload-custom">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <div class="col-sm-offset-4 col-sm-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="confrecord"> Запись разговора
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="options">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel icd-options">
+                <div class="panel-header">Распределение вызовов
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="method" class="col-sm-4">Метод распределения</label>
+                            <div class="col-sm-4">
+                                <select id="method" class="form-control">
+                                    <option value="0">равномерный</option>
+                                    <option value="1">по приоритету</option>
+                                    <option value="2">случайный</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="natimeout" class="col-sm-4">Время ожидания ответа</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="natimeout">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="resumetime" class="col-sm-4">Время поствызывной обработки</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="resumetime">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel icd-options">
+                <div class="panel-header">Настройка очереди
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="greeting" class="col-sm-4">Мелодия на удержании вызова:</label>
+                            <div class="col-sm-8">
+                                <input type="file" id="greeting" class="upload-custom">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="queuelen" class="col-sm-4">Длинна очереди</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="queuelen">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="overflowredirect" class="col-sm-4">Переадресация при переполнении</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="overflowredirect">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxqwait" class="col-sm-4">Макс. время ожидания в очереди</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="maxqwait">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="overtimeredirect" class="col-sm-4">Переадресация при превышении времени ожидания</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="overtimeredirect">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="indicationmode" class="col-sm-4">Оповещение об очереди</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="indicationmode">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="indicationtime" class="col-sm-4">Переодичность оповещения об очереди</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control" id="indicationtime">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel conf-options" id="conf-init-mode">
+                <div class="panel-header">Режим первоначального соединения в конференцию
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                <input type="radio" name="mode" class='init-mode' value="1"> Подключение к многоточечной конференции
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                  <input type="radio" name="mode" class='init-mode' value="0"> Подключение к инициатору (все только слушают)
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                  <input type="radio" name="mode" class='init-mode' value="2"> Подключение к инициатору (все слушают и говорят)
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="mode" class='init-mode' value="3"> Проигрывать аудио файл
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="onhold2" class="col-sm-4 control-label">Аудио файл:</label>
+                            <div class="col-sm-8">
+                                <input type="file" id="onhold2" class="upload-custom">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel conf-options">
+                <div class="panel-header">Настройки видео
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="videoform" class="col-sm-4">Видео формат</label>
+                            <div class="col-sm-4">
+                                <select id="videoform" class="form-control"></select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="profile">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Функции внутреннего номера
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="row">
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="hold"> Удержание и перевод
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="forwarding"> Переадресация вызова
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="dnd"> Не беспокоить
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="clir"> Скрытие обратного номера
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="callwaiting"> Ожидание вызова
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="pickupdeny"> Запрет перехвата вызова
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="busyoverdeny"> Запрет вторжения в разговор
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="monitordeny"> Запрет прослушивания разговора
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="dndover"> Преодоление режима "Не беспокоить"
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="busyover"> Вторжение в разговор
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="monitor"> Прослушивание разговора
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="callpickup"> Перехват вызова
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header"> Преобразование номеров
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="outcallbarring"> Запрет внешних исходящих вызовов
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="costroutebarring"> Запрет платных направлений
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table table-responsive" id="transforms">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Сохранить</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            

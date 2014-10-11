@@ -1,0 +1,458 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Имя транка" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> <span id="status" class="label label-default"> </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="connection">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Настройки регистрации
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-md-5 control-label">Протокол</label>
+                            <div class="col-md-2">
+                                <select id="protocol" class="form-control">
+                                    <option value="sip">sip</option>
+                                    <option value="sips">sips</option>
+                                    <option value="h323">h323</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="domain" class="col-md-5 control-label">Домен</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="domain" placeholder="Домен">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-5 col-md-4">
+                              <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="register"> Регистрация
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="user" class="col-md-5 control-label">Имя пользователя</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="user" placeholder="Имя пользователя">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="auth" class="col-md-5 control-label">Имя для авторизации</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="auth" placeholder="Имя для авторизации">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="pass" class="col-md-5 control-label">Пароль</label>
+                            <div class="col-md-4">
+                                <input type="password" class="form-control" id="pass" placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="regexpires" class="col-md-5 control-label">Период авторизации</label>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="regexpires" placeholder="Период авторизации">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-5 col-md-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="proxy"> Прокси
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="paddr" class="col-md-5 control-label">Адрес прокси сервера</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="proxy" id="paddr" placeholder="Адрес прокси сервера" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="pauth" class="col-md-5 control-label">Имя для авторизации</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="proxy" id="pauth" placeholder="Имя авторизации" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="ppass" class="col-md-5 control-label">Пароль</label>
+                            <div class="col-md-4">
+                                <input type="password" class="form-control" name="proxy" id="ppass" placeholder="Пароль" disabled="disabled">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="sip">
+                <div class="panel-header">Настройки SIP
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-sm-4">DTMF режим</label>
+                            <div class="col-md-4">
+                                <select id="dtmfsip" class="form-control">
+                                    <option value="sip info">sip info</option>
+                                    <option value="rfc2833">rfc2833</option>
+                                    <option value="inband">inband</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="h323">
+                <div class="panel-header">Настройки H.323
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-md-4">DTMF режим</label>
+                            <div class="col-md-4">
+                                <select id="dtmfh323" class="form-control">
+                                    <option value="h245alpha">h245alpha</option>
+                                    <option value="h245signal">h245signal</option>
+                                    <option value="rfc2833">rfc2833</option>
+                                    <option value="inband">inband</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="faststart"> Fast Start
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="h245tunneling"> H.245 Tunneling
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="playringback"> Play Ringback on Alerting
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Настройки медиа
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="t38fax"> T.38 Fax
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="video"> Video
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="earlymedia"> Early Media Connection
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="dtmfrelay"> DTMF Relay
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="codecs">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Аудио кодеки</th>
+                                    <th>Кадры(мс)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <select id="c0">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f0" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <select id="c1">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f1" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <select id="c2">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f2" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        <select id="c3">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f3" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h5>Timeouts:</h5>
+                    <hr>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <label for="t1" class="col-xs-1 control-label">T1</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t1">
+                            </div>
+                            <label for="t2" class="col-xs-1 control-label">T2</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t2">
+                            </div>
+                            <label for="t3" class="col-xs-1 control-label">T3</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t3">
+                            </div>
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="prefixes">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Входящие вызовы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="inmode"> Разрешить входящие вызовы
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxinbounds" class="col-md-4">Макс. соединений</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxinbounds" placeholder="Макс. соединений">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызывающего номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms2">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызываемого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Исходящие вызовы
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="outmode"> Разрешить исходящие вызовы
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxoutbounds" class="col-md-4">Макс. соединений</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxoutbounds" placeholder="Макс. соединений">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms3">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызывающего номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms4">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызываемого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Сохранить</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,932 @@
+/* 
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * Method: "getObjects"
+ * 
+ * Examples:
+ * 
+ * 1) Get the list of user groups:
+ * 
+ * -> { "method": "getObjects", "params": { "kind": "users" }, "id":1 }
+ * <- { "result": { [ "oid": "2364574722245", "name": "Marketing Department" ], [ "oid": "1462547254547", "name": "IT Department" ] }, "id":1 }
+ * 
+ * 2) Get the list of trunks:
+ * 
+ * -> { "method": "getObjects", "params": { "kind": "trunk" }, "id":1 }
+ * <- { "result": { [ "oid":"34627456635856", "name":"Trunk-1", "enabled":true ], [ "oid":"673422412414442", "name":"Trunk-2", "enabled":false, "status":"registration lost" ] }, "id":1 }
+ * 
+ * 
+ * 
+ * Parameters:
+ *  "kind" - the kind of objects. Must be one of the enumerated values:
+ *          "equipment" - "Extensions"
+ *          "unit"      - "Phone Groups"
+ *          "users"     - "User Groups"
+ *          "hunting"   - "Hunting Groups"
+ *          "pickup"    - "Pickup Groups"
+ *          "icd"       - "ICD Groups"
+ *          "cli"       - "CLI Groups"
+ *          "trunk"     - "Trunks"
+ *          "routes"    - "Routing Table"
+ *          "application" - "Applications"
+ *          
+ * Returns:
+ *  Array of objects:
+ *          "oid"  - object identifier
+ *          "name" - object name
+ *          "enabled" - object state (enable/disable)
+ */
+{
+    "jsonrpc": {
+        "method": "getObjects",
+        "params": {
+            "kind": {
+                "enum": [ "equipment", "unit", "users", "hunting", "pickup", "icd", "cli", "conference", "application", "trunk", "routes", "timer", "all" ]
+            }
+        },
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "oid": { "type": "string" },
+                    "name": { "type": "string" },
+                    "enabled": { "type": "boolean" }
+                }        
+            }
+        },
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "getExtensions"
+ * 
+ * Example:
+ * -> {"method":"getExtensions","id":1}
+ * <- {"result":{ ["ext":"101", "oid":"234254761347", "name":"John Smith", "kind":"user", "group":"Marketing", "state":1, "reg":"10.0.1.11:5060"],[ ... ], ... }, "id":1}
+ * 
+ * Parameters:
+ *  none
+ *          
+ * Returns:
+ *  Array of objects:
+ *          "ext"  - extension number
+ *          "oid"  - object identifier
+ *          "name" - object name
+ *          "kind" - the kind of object from: [ "user", "phone", "unit", "hunting", "icd", "application", "conference" ]
+ *          "group" - object group name
+ *          "state" - "user" or "phone" extension state
+ *          "state" - "user" or "phone" registration info
+ */
+{
+    "jsonrpc": {
+        "method": "getExtensions",
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ext": { "type": "string" },
+                    "oid": { "type": "string" },
+                    "name": { "type": "string" },
+                    "kind": {
+                        "enum": [ "user", "phone", "unit", "hunting", "icd", "application", "conference" ]
+                    }
+                    "group": { "type": "string" },
+                    "state": { "type": "integer" },
+                    "reg": { "type": "string" },
+                }
+            }
+        },
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "getObject"
+ * 
+ * Example:
+ * -> { "method": "getObject", "params": { "oid": "234254761347" }, "id":1 }
+ * <- { "result": { "oid": "234254761347", name":"John Smith", "kind":"user", "number":"101", "enabled":true, "features":{...} }, "id":1 }
+ * 
+ * Parameters:
+ *  "oid"   - object identifier
+ *          
+ * Returns:
+ *  Properties of requested object. 
+ */
+
+{
+    "jsonrpc": {
+        "method": "getObject",
+        "params": {
+            "oid": { "type": "string" }
+        },
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": {
+            "type": "object",
+            "enum": ["PbxExtension", "PbxGroup", "PbxApplication", "PbxConference", "RoutingTable", "Trunk"]
+        },
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "setObject"
+ * 
+ * Example:
+ * -> { "method": "setObject", "params":{"oid": "234254761347", name":"Ozzy", "features":{"fwdall":true, "fwdallnumber":"335452222"}}, "id":1 }
+ * <- { "result": "OK", "id":1 }
+ * 
+ * Parameters:
+ *  All or any of object's parameters.
+ *  Parameter "oid" must be present for update and must not be present for new created object
+ *          
+ * Returns:
+ *  "result": "OK" - success
+ *  or 
+ *  "error": "message"
+ */
+
+{
+    "jsonrpc": {
+        "method": "setObject",
+        "params": {
+            "type": "object",
+            "enum": ["PbxExtension", "PbxGroup", "PbxApplication", "PbxConference", "RoutingTable", "Trunk"]
+        },
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": "OK",
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "deleteObject"
+ * 
+ * Example:
+ * -> { "method": "deleteObject", "params": { "oid": "234254761347" }, "id":1 }
+ * <- { "result": "OK", "id":1 }
+ * 
+ * Parameters:
+ *  "oid"   - object identifier
+ *          
+ * Returns:
+ *  "result": "OK" - success
+ *  or 
+ *  "error": "message"
+ */
+
+{
+    "jsonrpc": {
+        "method": "deleteObject",
+        "params": {
+            "oid": { "type": "string" }
+        },
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": "OK",
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "getPbxOptions"
+ * 
+ * Parameters:
+ *  none
+ *          
+ * Returns:
+ *  "result": PbxOptions object
+ *  or 
+ *  "error": "message"
+ */
+
+{
+    "jsonrpc": {
+        "method": "getPbxOptions",
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": {
+            "enum": ["PbxOptions"]
+        },
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ * Method: "setPbxOptions"
+ * 
+ * Parameters:
+ *  PbxOptions object
+ *          
+ * Returns:
+ *  "result": "OK"
+ *  or 
+ *  "error": "message"
+ */
+
+{
+    "jsonrpc": {
+        "method": "setPbxOptions",
+        "params": {
+            "type": "object",
+            "enum": ["PbxOptions"]
+        },
+        "id": { "type": "integer" }
+    },
+    "returns": {
+        "result": "OK",
+        "id": { "type": "integer" }
+    }
+}
+
+/*
+ *  Object "PbxExtension"
+ *
+ */
+{
+    "title": "PbxExtension",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "kind": {
+            "enum": [ "phone", "user" ]
+        },
+        "name": { "type": "string" },
+        "number": { "type": "string" },
+        "display": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "groupid": { "type": "string" },
+        "followme": { "type": "string" },
+        "login": { "type": "string" },
+        "password": { "type": "string" },
+        "pin": { "type": "integer"},
+        "features": {
+            "type": "object",
+            "properties": {
+                "lock": { "type": "boolean" },
+                "clir": { "type": "boolean" },
+                "dnd": { "type": "boolean" },
+                "fwdall": { "type": "boolean" },
+                "fwdbusy": { "type": "boolean" },
+                "fwdnans": { "type": "boolean" },
+                "fwdnreg": { "type": "boolean" },
+                "pickupdeny": { "type": "boolean" },
+                "busyoverdeny": { "type": "boolean" },
+                "monitordeny": { "type": "boolean" },
+                "callwaiting": { "type": "boolean" },
+                "huntbusy": { "type": "boolean" },
+                "huntnans": { "type": "boolean" },
+                "huntnreg": { "type": "boolean" },
+                "recording": { "type": "boolean" },
+                "voicemail": { "type": "boolean" },
+                "fwdallnumber": { "type": "string" },
+                "fwdbusynumber": { "type": "string" },
+                "fwdnansnumber": { "type": "string" },
+                "fwdnregnumber": { "type": "string" },
+                "fwdtimeout": { "type": "integer" },
+                "huntingnumbers": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+    }
+}
+
+/*
+ *  Object "PbxGroup"
+ *
+ */
+{
+    "title": "PbxGroup",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string" },
+        "kind": {
+            "enum": [ "equipment", "unit", "users", "hunting", "pickup", "icd", "conference" ]
+        },
+        "members": {
+            "type": "array",
+            "items": { "type": "string" }
+        },
+        "available": {
+            "type": "array",
+            "items": { "type": "string" }
+        },
+        /* for "type": "equipment", "unit" or "users" */
+        "profile": {
+            "type": "object",
+            "properties": {
+                "hold": { "type": "boolean" },
+                "forwarding": { "type": "boolean" },
+                "callpickup": { "type": "boolean" },
+                "dndover": { "type": "boolean" },
+                "busyover": { "type": "boolean" },
+                "monitor": { "type": "boolean" },
+                "clir": { "type": "boolean" },
+                "dnd": { "type": "boolean" },
+                "pickupdeny": { "type": "boolean" },
+                "busyoverdeny": { "type": "boolean" },
+                "monitordeny": { "type": "boolean" },
+                "callwaiting": { "type": "boolean" },
+                "outcallbarring": { "type": "boolean" },
+                "costroutebarring": { "type": "boolean" },
+                "recording": { "type": "boolean" },
+                "voicemail": { "type": "boolean" },
+                "bnumbertransforms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "number": { "type": "string" },
+                            "strip":  { "type": "boolean"},
+                            "prefix": { "type": "string" }
+                        }
+                    }
+                }
+            }
+        },
+        "options": {
+            "enum":
+            [
+                /* "kind": "unit"] */
+                {
+                    "type": "object",
+                    "properties": {
+                        "huntmode" { "type": "integer" },
+                        "timeout" { "type": "integer" },
+                        "huntfwd" { "type": "boolean" },
+                        "groupno" { "type": "string" },
+                    }
+                },
+                /* "kind": "hunting" */
+                {
+                    "type": "object",
+                    "properties": {
+                        "huntmode" { "type": "integer" },
+                        "timeout" { "type": "integer" },
+                        "huntfwd" { "type": "boolean" },
+                    }
+                },
+                /* "kind": "pickup" */
+                {
+                    "type": "object",
+                    "properties": {
+                        "groupno" { "type": "string" },
+                    }
+                },
+                /* "kind": "icd" */
+                {
+                    "type": "object",
+                    "properties": {
+                        "groupno" { "type": "string" },
+                        "autologin" { "type": "boolean" },
+                        "priority" { "type": "integer" },
+                        "maxlines" { "type": "integer" },
+                        "canpickup" { "type": "boolean" },
+                        "method" { "type": "integer" },
+                        "natimeout" { "type": "integer" },
+                        "resumetime" { "type": "integer" },
+                        "greeting" { "type": "string" },
+                        "queuelen" { "type": "float" },
+                        "maxqwait" { "type": "integer" },
+                        "indicationmode" { "type": "integer" },
+                        "indicationtime" { "type": "integer" },
+                        "overflowredirect" { "type": "string" },
+                        "overtimeredirect" { "type": "string" },
+                    }
+                },
+                /* "kind": "equipment" */
+                {
+                    "type": "object",
+                    "properties": {
+                        "equipment": {
+                            "enum": [ "ipphones", "gateway", "trunk" ]
+                        },
+                        "address" { "type": "string" },
+                        "regname" { "type": "string" },
+                        "regpass" { "type": "string" },
+                        "phonelines" { "type": "integer" },
+                        "starflash" { "type": "boolean" },
+                    }
+                },
+                /* "kind": "conference" */
+                {
+                    "type": "object",
+                    "properties": {
+                        "initmode" { "type": "integer" },
+                        "dialtimeout" { "type": "integer" },
+                        "autoredial" { "type": "boolean" },
+                        "recording" { "type": "boolean" },
+                        "greeting" { "type": "boolean" },
+                        "videomode" {
+                            "enum": [ "OFF", "320x240", "352x288", "640x360", "640x480", "704x576", "1024x768", "1280x720", "1920x1080" ] 
+                        },
+                        "maxvideomode": { "type": "string" }
+                    }
+                }
+            ]
+        }
+    }    
+}
+
+/*
+ *  Object "PbxApplication"
+ *
+ */
+{
+    "title": "PbxApplication",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string" },
+        "parameters": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "key": { "type": "string" },
+                    "value": { "type": "string" },
+                }                
+            }
+        },
+        "debug": { "type": "boolean" },
+        "dbconnection": {
+            "type": "object" 
+            "properties": {
+                "driver": { "type": "string" },
+                "url": { "type": "string" },
+                "schema": { "type": "string" },
+                "username": { "type": "string" },
+                "password": { "type": "string" },
+            }                
+        },
+    }
+}
+
+/*
+ *  Object "CLIGroup"
+ *
+ */
+{
+    "title": "CLIGroup",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string" },
+        "numbers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "description": { "type": "string" }
+                }
+            }
+        }
+        "bnumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        }
+    }
+}
+
+/*
+ *  Object "Route"
+ *
+ */
+{
+    "title": "Route",
+    "type": "object",
+    "properties": {
+        "id": { "type": "string" },
+        "groupid": { "type": "string" },
+        "number": { "type": "string" },
+        "description": { "type": "string" },
+        "target": {
+            "type": "object",
+            "properties": {
+                "oid": { "type": "string" },
+                "name": { "type": "string" },
+            }
+        },
+        "priority": { "type": "integer" },
+        "cost": { "type": "float" },
+        "huntstop": { "type": "boolean" },
+    }
+}
+
+/*
+ *  Object "RoutingTable"
+ *
+ */
+{
+    "title": "RoutingTable",
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "oid": { "type": "string" },
+            "name": { "type": "string" },
+            "enabled": { "type": "boolean" },
+            "status": { "type": "string" },
+            "priorities": {
+                "type": "array",
+                "items": { "type": "integer" }
+            },
+            "anumbertransforms": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "number": { "type": "string" },
+                        "strip":  { "type": "boolean"},
+                        "prefix": { "type": "string" }
+                    }
+                }
+            },
+            "bnumbertransforms": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "number": { "type": "string" },
+                        "strip":  { "type": "boolean"},
+                        "prefix": { "type": "string" }
+                    }
+                }
+            },
+            "routes": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "id": { "type": "string" },
+                        "number": { "type": "string" },
+                        "description": { "type": "string" },
+                        "target": {
+                            "type": "object",
+                            "properties": {
+                                "oid": { "type": "string" },
+                                "name": { "type": "string" },
+                            }
+                        },
+                        "priority": { "type": "integer" },
+                        "cost": { "type": "float" },
+                        "huntstop": { "type": "boolean" },
+                    }
+                }
+            }
+        }
+    }   
+}
+
+/*
+ *  Object "Trunk"
+ *
+ */
+{
+    "title": "Trunk",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string" },
+        "deviceid": { "type": "string" },
+        "protocol": {
+            "enum": [ "sip", "h323" ]
+        },
+        "maxinbounds": { "type": "integer" },
+        "maxoutbounds": { "type": "integer" },
+        "register": { "type": "boolean" },
+        "domain": { "type": "string" },
+        "user": { "type": "string" },
+        "auth": { "type": "string" },
+        "pass": { "type": "string" },
+        "proxy": { "type": "boolean" },
+        "paddr": { "type": "string" },
+        "pauth": { "type": "string" },
+        "ppass": { "type": "string" },
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "codecs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "codec": { "type": "string" },
+                            "frame": { "type": "integer" },
+                        }
+                    },
+                }
+                "directrtp": { "type": "boolean" },
+                "buffering": { "type": "boolean" },
+                "transcoding": { "type": "boolean" },
+                "earlymedia": { "type": "boolean" },
+                "t38fax": { "type": "boolean" },
+                "video": { "type": "boolean" },
+                "dtmfrelay": { "type": "boolean" },
+                "dtmfmode": { "type": "string" },
+                "t1": { "type": "integer" },
+                "t2": { "type": "integer" },
+                "t3": { "type": "integer" },
+                "regexpires": { "type": "integer" },
+                "alertonprogress": { "type": "boolean" },
+                "noredirectinfo": { "type": "boolean" },
+                "passanumber": { "type": "boolean" },
+                "h323": {
+                    "type": "object",
+                    "properties": {
+                        "faststart": { "type": "boolean" },
+                        "h245tunneling": { "type": "boolean" },
+                        "playringback": { "type": "boolean" },
+                        "isdnatype": { "type": "string" },
+                        "isdnaplan": { "type": "string" },
+                        "isdnbtype": { "type": "string" },
+                        "isdnbplan": { "type": "string" },
+                        "presentation": { "type": "boolean" },
+                    }
+                }
+            }
+        },
+        "inboundanumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "inboundbnumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "outboundanumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "outboundbnumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        }
+    }    
+}
+
+/*
+ *
+ *  Object "Timer"
+ *
+ */
+    "title": "Timer",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "status": { "type": "string" },
+        "hour": { "type": "integer" },
+        "minute": { "type": "integer" },
+        "weekdays": {
+            "type": "array",
+            "items": {"type": "integer" }
+        },
+        "yeardays": {
+            "type": "array",
+            "items": {"type": "integer" }
+        },
+        "targets": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "oid": { "type": "string" },
+                    "name":  { "type": "string"},
+                    "action": {
+                        "enum": [ "Enable", "Disable", "Run instance" ] 
+                    }
+                }
+            }            
+        }
+    }
+
+/*
+ *  Object "PbxOptions"
+ *
+ */
+{
+    "title": "PbxOptions",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "lang": { "type": "string" },
+        "name": { "type": "string" },
+        "branchid": { "type": "string" },
+        "maxlines": { "type": "integer"},
+        "adminname": { "type": "string"},
+        "adminpass": { "type": "string"},
+        "options": {
+            "type": "object",
+            "properties": {
+                "holdmusicfile": { "type": "string" },
+                "holdremindtime": { "type": "integer" },
+                "holdrecalltime": { "type": "integer" },
+                "transferrecalltime": { "type": "integer" },
+                "transferrecallnumber": { "type": "string" },
+                "autoretrive": { "type": "boolean" },
+                "parkrecalltime": { "type": "integer" },
+                "parkrecallnumber": { "type": "string" },
+                "parkdroptimeout": { "type": "integer" },
+            }
+        },
+        "localtrunk": {
+            "type": "object",
+            "properties": {            
+                "inboundanumbertransforms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "number": { "type": "string" },
+                            "strip":  { "type": "boolean"},
+                            "prefix": { "type": "string" }
+                        }
+                    }
+                },
+                "inboundbnumbertransforms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "number": { "type": "string" },
+                            "strip":  { "type": "boolean"},
+                            "prefix": { "type": "string" }
+                        }
+                    }
+                },
+                "outboundanumbertransforms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "number": { "type": "string" },
+                            "strip":  { "type": "boolean"},
+                            "prefix": { "type": "string" }
+                        }
+                    }
+                },
+                "outboundbnumbertransforms": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "number": { "type": "string" },
+                            "strip":  { "type": "boolean"},
+                            "prefix": { "type": "string" }
+                        }
+                    }
+                }
+            }
+        }
+    }    
+}
+
+/*
+ *  Object "Application"
+ *
+ */
+{
+    "title": "Application",
+    "type": "object",
+    "properties": {
+        "oid": { "type": "string" },
+        "name": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "maxlines": { "type": "integer" },
+        "parameters": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "key": { "type": "string" },
+                    "value": { "type": "string" },
+                }                
+            }
+        },
+        "debug": { "type": "boolean" },
+        "dbconnection": {
+            "type": "object" 
+            "properties": {
+                "driver": { "type": "string" },
+                "url": { "type": "string" },
+                "owner": { "type": "string" },
+                "username": { "type": "string" },
+                "password": { "type": "string" },
+            }                
+        },
+        "inboundanumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "inboundbnumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "outboundanumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        },
+        "outboundbnumbertransforms": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "number": { "type": "string" },
+                    "strip":  { "type": "boolean"},
+                    "prefix": { "type": "string" }
+                }
+            }
+        }
+    }    
+}
+

@@ -1,0 +1,137 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Timer Name" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> Enabled
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Time and Day Selection
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="col-xs-12">
+                        <label for="hh" class="col-xs-2">Time</label>
+                        <div class="col-md-3 col-xs-4">
+                            <select id="hh" class="form-control"></select>
+                        </div>
+                        <div class="col-xs-1">:</div>
+                        <div class="col-md-3 col-xs-4">
+                            <select id="mm" class="form-control"></select>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <hr>
+                        <div class="col-xs-3">
+                            <button type="button" id="timer-everyday" class="btn btn-primary btn-sm">Everyday</button>
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="button" id="timer-workdays" class="btn btn-primary btn-sm">Weekdays</button>
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="button" id="timer-holidays" class="btn btn-primary btn-sm">Holidays</button>
+                        </div>
+                        <div class="col-xs-3">
+                            <button type="button" id="timer-calendar" class="btn btn-primary btn-sm" disabled="disabled">Calendar</button>
+                        </div>
+                    </div>
+                    <div class="col-xs-12">
+                        <hr>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d0"> Mon
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d1"> Tue
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d2"> Wed
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d3"> Thu
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d4"> Fri
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d5"> Sat
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-xs-3">
+                            <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="d6"> Sun
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Target Selection
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <table class="table" id="targets">
+                        <thead>
+                            <tr>
+                                <th><select id="objects" class="form-control"></select>
+                                </th>
+                                <th>
+                                    <select id="actions" class="form-control">
+                                        <option value="Enable">Enable</option>
+                                        <option value="Disable">Disable</option>
+                                    </select>
+                                </th>
+                                <th><button type="button" id="add-timer-target" class="btn btn-primary btn-md">Add</button></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Save Changes</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

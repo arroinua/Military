@@ -1,0 +1,75 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Group Name" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> Enabled
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">CLI Numbers
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table">
+                        <table class="table" id="clinumbers">
+                            <thead>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>
+                                        <a href="" class="add-clr clirow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Called Party Number Transforms
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Save Changes</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

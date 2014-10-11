@@ -1,0 +1,168 @@
+<div id="el-loaded-content">
+    <div class="calls-stat-mini">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-3">
+                                <div class="col-xs-6">
+                                    <span class="postv-col"><i class="glyphicon glyphicon-arrow-down"></i></span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <span class="calls-incoming">0</span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="col-xs-6">
+                                    <span class="neutral-col"><i class="glyphicon glyphicon-arrow-up"></i></span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <span class="calls-outgoing">0</span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="col-xs-6">
+                                    <span class="neutral-col"><i class="glyphicon glyphicon-link"></i></span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <span class="calls-connected">0</span>
+                                </div>
+                            </div>
+                            <div class="col-xs-3">
+                                <div class="col-xs-6">
+                                    <span class="neutral-col"><i class="glyphicon glyphicon-dashboard"></i></span>
+                                </div>
+                                <div class="col-xs-6">
+                                    <span class="calls-load">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="calls-stat">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="col-lg-3 col-sm-6 col-xs-12">
+                    <div class="panel panel-mini">
+                        <div class="panel-body">
+                            <div class="col-xs-6">
+                                <h1 class="pl-img postv-col"><i class="glyphicon glyphicon-arrow-down"></i></h1>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h1 class="calls-incoming">0</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 pl-txt">
+                            <h5>Incoming Calls</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-xs-12">
+                    <div class="panel panel-mini">
+                        <div class="panel-body">
+                            <div class="col-xs-6">
+                                <h1 class="pl-img neutral-col"><i class="glyphicon glyphicon-arrow-up"></i></h1>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h1 class="calls-outgoing">0</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 pl-txt">
+                            <h5>Outgoing Calls</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-xs-12">
+                    <div class="panel panel-mini">
+                        <div class="panel-body">
+                            <div class="col-xs-6">
+                                <h1 class="pl-img neutral-col"><i class="glyphicon glyphicon-link"></i></h1>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h1 class="calls-connected">0</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 pl-txt">
+                            <h5>Connected Calls</h5>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-sm-6 col-xs-12">
+                    <div class="panel panel-mini">
+                        <div class="panel-body">
+                            <div class="col-xs-6">
+                                <h1 class="pl-img neutral-col"><i class="glyphicon glyphicon-dashboard"></i></h1>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <h1 class="calls-load">0%</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xs-12 pl-txt">
+                            <h5>Load Ports</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 col-xs-12">
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="calls-trunks">
+                            <thead>
+                                <tr>
+                                    <th style="width:5px;"><span><i class="glyphicon glyphicon-signal"></i></span></th>
+                                    <th>Trunk</th>
+                                    <th><span class="postv-col"><i class="glyphicon glyphicon-arrow-down"></i></span></th>
+                                    <th><span class="neutral-col"><i class="glyphicon glyphicon-arrow-up"></i></span></th>
+                                    <th><span class="neutral-col"><i class="glyphicon glyphicon-dashboard"></i></span></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-xs-12">
+            <div class="panel">
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped" id="calls-table">
+                            <thead>
+                                <tr>
+                                    <th>Caller</th>
+                                    <th>Called</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

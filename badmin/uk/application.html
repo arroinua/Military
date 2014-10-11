@@ -1,0 +1,121 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Ім`я аплікації" readonly="readonly">
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> <span id="status" class="label label-default"> </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Налаштування аплікації
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" id="debug"> Налагодження
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="appvariables">
+                            <thead>
+                                <tr>
+                                    <th>Змінна</th>
+                                    <th>Значення</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Підключення до БД
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" id="odbc" name="url"> ODBC Драйвер
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="odbcurl" placeholder="Ім'я джерела даных ODBC">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" id="jdbc" name="url"> JDBC Драйвер
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="jdbcurl" class="col-sm-12">Ім'я драйвера JDBC:</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="jdbcdriver" placeholder="Ім'я драйвера JDBC">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="jdbcurl" class="col-sm-12">URL драйвера:</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="jdbcurl" placeholder="URL драйвера JDBC">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="dbowner" class="col-sm-4 control-label">Власник БД</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="dbowner" placeholder="Власник БД">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="dbusername" class="col-sm-4 control-label">Користувач</label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" id="dbuser" placeholder="Користувач">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="dbpass" class="col-sm-4 control-label">Пароль</label>
+                            <div class="col-sm-8">
+                                <input type="password" class="form-control" id="dbpass" placeholder="Пароль">
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Зберегти</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Видалити</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>

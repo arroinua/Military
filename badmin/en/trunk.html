@@ -1,0 +1,458 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Trunk Name" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> <span id="status" class="label label-default"> </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="connection">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Registration Properties
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-md-5 control-label">Protocol</label>
+                            <div class="col-md-2">
+                                <select id="protocol" class="form-control">
+                                    <option value="sip">sip</option>
+                                    <option value="sips">sips</option>
+                                    <option value="h323">h323</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="domain" class="col-md-5 control-label">Domain</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="domain" placeholder="Domain">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-5 col-md-4">
+                              <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="register"> Registration
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="user" class="col-md-5 control-label">User Name</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="user" placeholder="User Name">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="auth" class="col-md-5 control-label">Authorization Name</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="auth" placeholder="Authorization Name">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="pass" class="col-md-5 control-label">Password</label>
+                            <div class="col-md-4">
+                                <input type="password" class="form-control" id="pass" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="regexpires" class="col-md-5 control-label">Expires</label>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="regexpires" placeholder="Expires">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-5 col-md-4">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="proxy"> Proxy
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="paddr" class="col-md-5 control-label">Proxy Address</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="proxy" id="paddr" placeholder="Proxy Address" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="pauth" class="col-md-5 control-label">Proxy Authorization Name</label>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="proxy" id="pauth" placeholder="Proxy Auth Name" disabled="disabled">
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="ppass" class="col-md-5 control-label">Proxy Password</label>
+                            <div class="col-md-4">
+                                <input type="password" class="form-control" name="proxy" id="ppass" placeholder="Proxy Password" disabled="disabled">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="sip">
+                <div class="panel-header">SIP Protocol Properties
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-sm-4">DTMF Mode</label>
+                            <div class="col-md-4">
+                                <select id="dtmfsip" class="form-control">
+                                    <option value="sip info">sip info</option>
+                                    <option value="rfc2833">rfc2833</option>
+                                    <option value="inband">inband</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel" id="h323">
+                <div class="panel-header">H.323 Protocol Properties
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="huntmode1" class="col-md-4">DTMF Mode</label>
+                            <div class="col-md-4">
+                                <select id="dtmfh323" class="form-control">
+                                    <option value="h245alpha">h245alpha</option>
+                                    <option value="h245signal">h245signal</option>
+                                    <option value="rfc2833">rfc2833</option>
+                                    <option value="inband">inband</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="faststart"> Fast Start
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="h245tunneling"> H.245 Tunneling
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="playringback"> Play Ringback on Alerting
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Media Properties
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-inline">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="t38fax"> T.38 Fax
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="video"> Video
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="earlymedia"> Early Media Connection
+                                </label>
+                              </div>
+                            </div>
+                            <div class="col-md-6">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="dtmfrelay"> DTMF Relay
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="codecs">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Audio Codec</th>
+                                    <th>Frame(ms)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>
+                                        <select id="c0">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f0" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2</td>
+                                    <td>
+                                        <select id="c1">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f1" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3</td>
+                                    <td>
+                                        <select id="c2">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f2" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>4</td>
+                                    <td>
+                                        <select id="c3">
+                                            <option value="0">------</option>
+                                            <option value="G.711 Alaw">G.711 Alaw</option>
+                                            <option value="G.711 Ulaw">G.711 Ulaw</option>
+                                            <option value="G.729">G.729</option>
+                                            <option value="G.723">G.723</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <div class="form-group">
+                                            <input type="text" id="f3" class="form-control">
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <h5>Timeouts:</h5>
+                    <hr>
+                    <div class="form-group">
+                        <div class="col-xs-12">
+                            <label for="t1" class="col-xs-1 control-label">T1</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t1">
+                            </div>
+                            <label for="t2" class="col-xs-1 control-label">T2</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t2">
+                            </div>
+                            <label for="t3" class="col-xs-1 control-label">T3</label>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" id="t3">
+                            </div>
+                        </div>
+                            
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="prefixes">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Inbound Calls
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="inmode"> Inbound Mode
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxinbounds" class="col-md-4">Max Connection</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxinbounds" placeholder="Max Connection">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr><th colspan="5">Calling Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms2">
+                            <thead>
+                                <tr><th colspan="5">Called Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Outbound Calls
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="outmode"> Outbound Mode
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxoutbounds" class="col-md-4">Max Connection</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxoutbounds" placeholder="Max Connection">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms3">
+                            <thead>
+                                <tr><th colspan="5">Calling Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms4">
+                            <thead>
+                                <tr><th colspan="5">Called Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Save Changes</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

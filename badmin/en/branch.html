@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Smile-soft - Branch Administrator</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <!--<meta charset="utf-8">-->
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <link href="/badmin/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" href="/badmin/css/style.css" type="text/css" />
+        <script type="text/javascript" src="/badmin/js/vendors/jquery.min.js"></script>
+        <script type="text/javascript" src="/badmin/js/vendors/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/badmin/js/vendors/sortable.min.js"></script>
+    </head>
+    <body>
+        <div id="pagecontainer" class="page-container">
+            <div id="pbxmenu" class="page-sidebar pbx-menu">
+                <div class="nav-logo">
+                    <a href="#" class="small-logo"><img src="/badmin/images/small-logo.png" alt="logo"></a>
+                    <a href="#" class="big-logo"><img src="/badmin/images/logo.png" alt="logo"></a>
+                </div>
+                <ul>
+                    <li>
+                        <a href="#calls" title="Calls">
+                            <i class="glyphicon glyphicon-earphone"></i>
+                            <span>Calls</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#extensions" title="Extensions">
+                            <i class="glyphicon glyphicon-signal"></i>
+                            <span>Extensions</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" title="Extension Groups">
+                            <i class="glyphicon glyphicon-phone-alt"></i>
+                            <span>Extension Groups</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                        <ul>
+                            <li><a href="#" data-kind="equipment" title="Terminal Equipment">
+                                    <span>Terminal Equipment</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li><a href="#" data-kind="unit" title="Organization Units">
+                                    <span>Organization Units</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-kind="users" title="Users">
+                                    <span>Users</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-kind="icd" title="Call Center">
+                                    <span>Call Center</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-kind="hunting" title="Hunting">
+                                    <span>Hunting</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-kind="pickup" title="Pickup">
+                                    <span>Pickup</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" data-kind="cli" title="CLI">
+                                    <span>CLI</span>
+                                    <i class="glyphicon glyphicon-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" data-kind="trunk" title="Trunks">
+                            <i class="glyphicon glyphicon-cloud"></i>
+                            <span>Trunks</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-kind="application" title="Applications">
+                            <i class="glyphicon glyphicon-play-circle"></i>
+                            <span>Applications</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-kind="conference" title="Conferences">
+                            <i class="glyphicon glyphicon-comment"></i>
+                            <span>Conferences</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-kind="timer" title="Timers">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <span>Timers</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-kind="routes" title="Routing">
+                            <i class="glyphicon glyphicon-transfer"></i>
+                            <span>Routing</span>
+                            <i class="glyphicon glyphicon-chevron-right"></i>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#records" title="Records">
+                            <i class="glyphicon glyphicon-time"></i>
+                            <span>Records</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="pagecontent" class="page-content">
+                <nav class="navbar nav-bar">
+                    <ul class="nav nav-bar-nav">
+                        <li>
+                            <a href="#" class="sidebar-toggle">
+                                <i class="glyphicon glyphicon-th-list"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <ul id="el-slidemenu" class="nav nav-bar-nav pull-right slide-menu">
+                        <li>
+                            <a href="#" class="options-open">
+                                <i class="glyphicon glyphicon-cog"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div id="dcontainer" class="container-fluid data-container">
+                </div>
+            </div>
+            <div id="pbxoptions" class="page-sidebar pbx-options">
+                <div class="navbar nav-bar options-nav">
+                    <ul class="nav nav-bar-nav">
+                        <li>
+                            <a href="#" id="el-set-options" class="el-save-options">
+                                Save changes
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-bar-nav pull-right">
+                        <li>
+                            <a href="#" class="options-close">
+                                <i class="glyphicon glyphicon-cog"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div id="mainopt-tab" class="tab-pane">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="interfacelang" class="col-md-4 control-label">Language</label>
+                            <div class="col-md-8">
+                                <select id="interfacelang" class="form-control">
+                                    <option value="en">English</option>
+                                    <option value="uk">Українська</option>
+                                    <option value="ru">Русский</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="branchname" class="col-sm-12">Branch Name</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="branchname" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="branchid" class="col-sm-12">Branch Prefix</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="branchid" readonly>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-offset-1 col-xs-11">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="maxcon" id='unlimconn' value="0"> Unlimited Connections
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-offset-1 col-xs-11">
+                              <div class="radio">
+                                <label>
+                                    <input type="radio" name="maxcon" id='limconn' value="1"> Limited Connections
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="maxlines" class="col-sm-7 control-label">Max. Connection</label>
+                            <div class="col-sm-5">
+                                <input type="text" class="form-control" id="maxlines">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="adminpass" class="col-sm-12">Password</label>
+                            <div class="col-sm-12">
+                                <input type="password" class="form-control" id="adminpass">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmpass" class="col-sm-12">Confirm Password</label>
+                            <div class="col-sm-12">
+                                <input type="password" class="form-control" id="confirmpass">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <ul class="tab-toggles">
+                                <li>
+                                    <a href="#" class="tab-switcher" data-tab="featureopt-tab">Feature Settings
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="tab-switcher" data-tab="transopt-tab">Number Transforms
+                                        <i class="glyphicon glyphicon-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="featureopt-tab" class="tab-pane">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <ul class="tab-toggles">
+                                <li>
+                                    <a href="#" class="tab-switcher" data-tab="mainopt-tab">
+                                        <i class="glyphicon glyphicon-chevron-left"></i>
+                                        Branch Settings
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <form class="form-horizontal">
+                        <h4>Call Hold Feature</h4>
+                        <div class="form-group">
+                            <label for="musonhold" class="col-sm-4">Music on Hold:</label>
+                            <div class="col-sm-8">
+                                <input type="file" id="musonhold" class="upload-custom">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="holdreminterv" class="col-sm-12">Remind Interval</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="holdreminterv">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="holdrectime" class="col-sm-12">Recall Time</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="holdrectime">
+                            </div>
+                        </div>
+                        <h4>Call Transfer Feature</h4>
+                        <div class="form-group">
+                            <label for="transrectime" class="col-sm-12">Recall Time</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="transrectime">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="transrecdest" class="col-sm-12">Recall Destination</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="transrecdest">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="autoretrieve"> Auto-retrieve when destination is busy
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <h4>Call Park Feature</h4>
+                        <div class="form-group">
+                            <label for="parkrectime" class="col-sm-12">Recall Time</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="parkrectime">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="parkrecdest" class="col-sm-12">Recall Destination</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="parkrecdest">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="discontime" class="col-sm-12">Disconnect Time</label>
+                            <div class="col-sm-12">
+                                <input type="text" class="form-control" id="discontime">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div id="transopt-tab" class="tab-pane">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <ul class="tab-toggles">
+                                <li>
+                                    <a href="#" class="tab-switcher" data-tab="mainopt-tab">
+                                        <i class="glyphicon glyphicon-chevron-left"></i>
+                                        Branch Settings
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <h4>Inbound Transforms</h4>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms5">
+                            <thead>
+                                <tr><th colspan="5">Calling Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms6">
+                            <thead>
+                                <tr><th colspan="5">Called Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <h4>Outbound Transforms</h4>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms7">
+                            <thead>
+                                <tr><th colspan="5">Calling Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms8">
+                            <thead>
+                                <tr><th colspan="5">Called Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="/badmin/js/badmin.js"></script>
+        <script type="text/javascript" src="/badmin/js/objects.js"></script>
+    </body>
+</html>

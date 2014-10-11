@@ -1,0 +1,131 @@
+{
+
+    "saved": {
+        "en": "All changes saved",
+        "uk": "Всі зміни збережені",
+        "ru": "Все изменения сохранены"
+    },
+    "save": {
+        "en": "Save",
+        "uk": "Зберегти",
+        "ru": "Сохранить"
+    },
+    "cancel": {
+        "en": "Cancel",
+        "uk": "Відмінити",
+        "ru": "Отменить"
+    },
+    "edit": {
+        "en": "Edit",
+        "uk": "Редагувати",
+        "ru": "Редактировать"
+    },
+    "missedNameField": {
+        "en": "Please, fill object name",
+        "uk": "Будь ласка, заповніть ім'я об'єкта",
+        "ru": "Пожалуйста, заполните имя объекта"
+    },
+    "missedField": {
+        "en": "Please, fill all required fields",
+        "uk": "Будь ласка, заповніть всі необхідні поля",
+        "ru": "Пожалуйста, заполните все необходимые поля"
+    },
+    "timeout": {
+        "en": "Operation timeout",
+        "uk": "Таймаут операції",
+        "ru": "Таймаут операции"
+    },
+    "error": {
+        "en": "An error has occured",
+        "uk": "Сталося помилка",
+        "ru": "Возникла ошибка"
+    },
+    "uploaded": {
+        "en": "uploaded",
+        "uk": "завантажен",
+        "ru": "загружен"
+    },
+    "created": {
+        "en": "created",
+        "uk": "створений",
+        "ru": "создан"
+    },
+    "doDelete": {
+        "en": "Delete",
+        "uk": "Видалити",
+        "ru": "Удалить"
+    },
+    "from": {
+        "en": "from",
+        "uk": "з",
+        "ru": "из"
+    },
+    "more": {
+        "en": "More",
+        "uk": "Більше",
+        "ru": "Больше"
+    },
+    "less": {
+        "en": "Less",
+        "uk": "Менше",
+        "ru": "Меньше"
+    },
+    "pickrError1": {
+        "en": "Selected date couldn't be greater than current date",
+        "uk": "Обрана дата не може бути більше поточної дати",
+        "ru": "Выбранная дата не может быть больше текущей даты"
+    },
+    "pickrError2": {
+        "en": "Start date of the sample should not exceed the end date",
+        "uk": "Дата початку вибірки не повинна перевищувати дату закінчення",
+        "ru": "Дата начала выборки не должна превышать дату окончания"
+    },
+    "codes": {
+        "one": {
+            "en": "unallocated number",
+            "uk": "невизначений номер",
+            "ru": "неопределенний номер"
+        },
+        "three": {
+            "en": "no destination",
+            "uk": "немає маршруту",
+            "ru": "нет маршрута"
+        },
+        "sixteen": {
+            "en": "call clearing",
+            "uk": "виклик завершився",
+            "ru": "вызов завершен"
+        },
+        "seventeen": {
+            "en": "user busy",
+            "uk": "номер зайнятий",
+            "ru": "номер занят"
+        },
+        "eighteen": {
+            "en": "no responding",
+            "uk": "немає відповіді",
+            "ru": "нет ответа"
+        },
+        "nineteen": {
+            "en": "no responding",
+            "uk": "немає відповіді",
+            "ru": "нет ответа"
+        },
+        "twentyone": {
+            "en": "call rejected",
+            "uk": "виклик відхилин",
+            "ru": "вызов отклонен"
+        },
+        "twentytwo": {
+            "en": "number changed",
+            "uk": "номер змінен",
+            "ru": "номер изменен"
+        },
+            "twentyeight": {
+            "en": "invalid format",
+            "uk": "невірний формат",
+            "ru": "неверный формат"
+        }
+    }
+
+}

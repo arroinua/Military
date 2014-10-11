@@ -1,0 +1,120 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Routing Table Name" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> Enabled
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="options">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Routing Rules by Priority
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="selectable-cont">
+                        <div class="selectable-box selectable-routes">
+                            <ul id="priorities" class="el-sortable"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Incoming Prefix Transforms
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr><th colspan="5">Calling Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms2">
+                            <thead>
+                                <tr><th colspan="5">Called Party Number Transforms</th></tr>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Strip</th>
+                                    <th>Prefix</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="routes">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Routing Table
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table" id="rtable">
+                            <thead>
+                                <tr>
+                                    <th>Number</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Status</th>
+                                    <th>Cost</th>
+                                    <th>
+                                        <a href="" class="add-clr routerow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Save Changes</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

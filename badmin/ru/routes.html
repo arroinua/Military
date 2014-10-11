@@ -1,0 +1,120 @@
+<div id="el-loaded-content">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Имя таблицы" autofocus>
+                <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> Вкл.
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="options">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Правила маршрутизации по приоритету
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="selectable-cont">
+                        <div class="selectable-box selectable-routes">
+                            <ul id="priorities" class="el-sortable"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Преобразование входящих вызовов
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызывающего номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms2">
+                            <thead>
+                                <tr><th colspan="5">Преобразование вызываемого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стрип</th>
+                                    <th>Префикс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="routes">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Таблица маршрутизации
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table" id="rtable">
+                            <thead>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Описание</th>
+                                    <th>Объект</th>
+                                    <th>Статус</th>
+                                    <th>Стоимость</th>
+                                    <th>
+                                        <a href="" class="add-clr routerow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-body">
+                    <button type="button" id="el-set-object" class="btn btn-primary btn-lg">Сохранить</button>
+                    <button type="button" id="el-delete-object" class="btn btn-danger btn-lg delete-obj">Удалить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
