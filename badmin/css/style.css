@@ -16,6 +16,9 @@ html,body{
 .page-content.squeezed-right{
     margin-left: 250px;
 }
+.hidden{
+    display: none;
+}
 .visible{
     opacity: 1;
 }
@@ -122,7 +125,11 @@ input[readonly].readonly-custom{
     margin: 0;
     padding: 0;
 }
-.pbx-menu ul ul {
+/*.pbx-menu ul ul {
+  display: none;
+  background-color: #222
+}*/
+.pbx-menu li > ul {
   display: none;
   background-color: #222
 }
@@ -171,10 +178,10 @@ input[readonly].readonly-custom{
 .panel .panel-header i{
     float: right;
     font-size: .7em;
-    -moz-transition: all 300ms ease-in-out;
+    /*-moz-transition: all 300ms ease-in-out;
     -o-transition: all 300ms ease-in-out;
     -webkit-transition: all 300ms ease-in-out;
-    transition: all 300ms ease-in-out;
+    transition: all 300ms ease-in-out;*/
 }
 .pbx-menu li.active > a i:last-child{
   -moz-transform: rotate(90deg);
@@ -195,6 +202,9 @@ input[readonly].readonly-custom{
 .pbx-menu li.active {
   border-bottom: none;
   background-color: #222
+}
+.pbx-menu li.active > ul {
+    display: block;
 }
 .pbx-menu li.active > a {
   color: #fff;
@@ -334,7 +344,6 @@ ul.nav-bar-nav a.nav-active{
     background-color: #fff;
     margin-bottom: 20px;
 }
-
 .panel-header{
     background-color: #333;
     border-bottom: 1px solid #ccc;
@@ -435,6 +444,13 @@ ul.nav-bar-nav a.nav-active{
 .extended-btn{
     text-align: center;
     padding: 10px 0;
+}
+
+.pl-kind{
+    display: none;
+}
+.pl-kind.revealed{
+    display: block;
 }
 
 /*Page Content Styles End*/

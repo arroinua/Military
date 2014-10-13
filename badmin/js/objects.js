@@ -1,705 +1,82 @@
 
-window.onerror = function(msg, url, linenumber) {
-     console.error('Error message: '+msg+'\nURL: '+url+'\nLine number: '+linenumber);
- };
-
-/*
-*
-* Dashboard UI
-*
-*/
-
-function CallsBoard(){
-    var loaded = false,
-        inc = document.querySelectorAll('.calls-incoming'),
-        out = document.querySelectorAll('.calls-outgoing'),
-        conn = document.querySelectorAll('.calls-connected'),
-        load = document.querySelectorAll('.calls-load'),
-        ttrunks = document.getElementById('calls-trunks').querySelector('tbody'),
-        tcalls = document.getElementById('calls-table').querySelector('tbody'),
-        lrow = ttrunks.rows.length,
-        row, cell, a;
-
-
-    this.init = function(){
-        this.update = setInterval(this.checkStates.bind(this), 1000);
-        addEvent(window, 'hashchange', this.stopUpdate.bind(this));
-    };
-
-    this.checkStates = function(){
-        sendData('getCurrentCalls', null, 5);
-        sendData('getCurrentState', null, 6);
-        // json_rpc_async('getCurrentCalls', null, this.setCurrentCalls.bind(this));
-        // json_rpc_async('getCurrentState', null, this.setCurrentState.bind(this));
-
-        console.log('update');
-    };
-
-    this.setCurrentState = function(result){
-
-        if(loaded == false){
-            loaded = true;
-            show_content();
-        }
-
-        var trunks = result.trunks;
-
-        for (var i = 0; i < inc.length; i++) {
-            if(inc[i].textContent != result.in) inc[i].textContent = result.in; 
-        };
-        for (var i = 0; i < out.length; i++) {
-            if(out[i].textContent != result.out) out[i].textContent = result.out;
-        };
-        for (var i = 0; i < conn.length; i++) {
-            if(conn[i].textContent != result.conn) conn[i].textContent = result.conn;
-        };
-        for (var i = 0; i < load.length; i++) {
-            load[i].textContent = Math.round(result.load) + '%';
-        };
-
-        for (var i = 0; i < trunks.length; i++) {
-            
-            var className = trunks[i].enabled ? 'success' : 'danger';
-            if(ttrunks.rows[i]){
-                ttrunks.rows[i].cells[0].className = className;
-                if(ttrunks.rows[i].cells[1].firstChild.textContent != trunks[i].name)
-                    ttrunks.rows[i].cells[1].firstChild.textContent = trunks[i].name;
-                if(ttrunks.rows[i].cells[2].textContent != trunks[i].in)
-                    ttrunks.rows[i].cells[2].textContent = trunks[i].in;
-                if(ttrunks.rows[i].cells[3].textContent != trunks[i].out)
-                    ttrunks.rows[i].cells[3].textContent = trunks[i].out;
-                ttrunks.rows[i].cells[4].textContent = Math.round(trunks[i].load) + '%';
-            }
-            else{
-                row = ttrunks.insertRow(i);
-                
-                cell = row.insertCell(0);
-                cell.className = className;
-
-                cell = row.insertCell(1);
-                a = document.createElement('a');
-                a.href = '#trunk?'+trunks[i].oid;
-                a.textContent = trunks[i].name;
-                cell.appendChild(a);
-
-                cell = row.insertCell(2);
-                cell.textContent = trunks[i].in;
-
-                cell = row.insertCell(3);
-                cell.textContent = trunks[i].out;
-
-                cell = row.insertCell(4);
-                cell.textContent = Math.round(trunks[i].load) + '%';
-            }
-
-        };
-        
-    };
-
-    this.setCurrentCalls = function(result){
-
-        if(tcalls.rows.length > result.length) {
-            this.clearTable(tcalls, result.length);
-        }
-
-        for (var i = 0; i < result.length; i++) {
-
-            if(tcalls.rows[i]){
-                tcalls.rows[i].cells[0].textContent = result[i].caller;
-                tcalls.rows[i].cells[1].textContent = result[i].called;
-                if(result[i].time)
-                    tcalls.rows[i].cells[2].textContent = result[i].time;
-            }
-            else{
-                row = tcalls.insertRow(i);
-                
-                cell = row.insertCell(0);
-                cell.textContent = result[i].caller;
-
-                cell = row.insertCell(1);
-                cell.textContent = result[i].called;
-
-                cell = row.insertCell(2);
-                cell.textContent = result[i].time;
-            }
-
-        };
-
-    };
-
-    this.clearTable = function(table, rows){
-
-        row = rows - 1;
-        while(table.rows.length != rows){
-
-            table.deleteRow(row);
-            row = row - 1;
-
-        }
-
-    };
-
-    this.stopUpdate = function(){
-        console.log('update removed');
-        clearInterval(this.update);
-        removeEvent(window, 'hashchange', this.stopUpdate.bind(this));
-
-    }
-
-    this.init();
-
-}
-
-function load_calls(){
-
-    PbxObject.CallsBoard = new CallsBoard();
-
-}
-
-/* 
- * Record Viewer object constructor.
- * Record Viewer allow to get calls data from CDR. 
- */
-
- function RecViewer(elements, picker){
-
-    var picker = picker || 'dtPicker',
-        seldays = document.getElementById('dtday'),
-        selmonths = document.getElementById('dtmonth'),
-        selyears = document.getElementById('dtyear'),
-        selhours = document.getElementById('dthour'),
-        selminutes = document.getElementById('dtmin'),
-        number = document.getElementById('searchnum'),
-        trunk = document.getElementById('searchtrunk'),
-        rows = document.getElementById('searchrows'),
-        elorder = document.querySelectorAll('.init-order'),
-        elmode = document.querySelectorAll('.init-mode'),
-        table = document.getElementById('records-table').querySelector('tbody');
-
-    this.currentPicker = null;
-    this.pickers = {};
-    this.date = {};
-    this.records = {};
-
-    this._init = function(){
-
-        var btn = document.getElementById('getcalls-btn'),
-            setbtn = document.getElementById('set-picker');
-
-        for (var i = 0; i < elements.length; i++) {
-            addEvent(elements[i], 'click', this._showPicker.bind(this));
-            if(elements[i].getAttribute('data-pickr') == 'from'){
-                this.pickers.from = elements[i];
-            }
-            else if(elements[i].getAttribute('data-pickr') == 'to'){
-                this.pickers.to = elements[i];
-            }
-        };
-
-        addEvent(setbtn, 'click', this._setPicker.bind(this));
-        addEvent(btn, 'click', this._getRecords.bind(this));
-
-        this._fillFields();
-        this.date.from = this._currentDate(null, null, null, '00', '00');
-        this.date.to = this._currentDate();
-        this._setResultDate();
-
-    };
-
-    this._setResultDate = function(){
-
-        this.pickers.from.value = this._getStringDate(this.date.from);
-        this.pickers.to.value = this._getStringDate(this.date.to);
-
-        show_content();
-
-    };
-
-    this._currentDate = function(dday, mmonth, yyear, hhours, mminutes){
-
-        var date = new Date();
-
-        return {
-
-            day: (function(){
-                day = date.getDate();
-                if(day < 10) day = '0' + day;
-                return dday || day;
-            })(),
-            month: (function(){
-                month = date.getMonth() + 1;
-                if(month < 10) month = '0' + month;
-                return mmonth || month;
-            })(),
-            year: (function(){
-                return yyear || date.getFullYear();
-            })(),
-            hours: (function(){
-                hours = date.getHours();
-                if(hours < 10) hours = '0' + hours;
-                return hhours || hours;
-            })(),
-            minutes: (function(){
-                minutes = date.getMinutes();
-                if(minutes < 10) minutes = '0' + minutes;
-                return mminutes || minutes;
-            })()
-        }
-
-    };
-
-    this._fillFields = function(){
-
-        var option = null,
-            cyear = new Date().getFullYear();
-
-        for(var i=1; i<32; i++){
-            if(i<10) 
-                this._addOption(seldays, '0' + i);
-            else
-                this._addOption(seldays, i);
-        }
-        for(var i=1; i<13; i++){
-            if(i<10) 
-                this._addOption(selmonths, '0' + i);
-            else
-                this._addOption(selmonths, i);
-        }
-        for(var i=2000; i<cyear+1; i++){
-            if(i<10) 
-                this._addOption(selyears, '0' + i);
-            else
-                this._addOption(selyears, i);
-        }
-    };
-
-    this._showPicker = function(e){
-
-        this.currentPicker = e.target;
-        kind = e.target.getAttribute('data-pickr');
-
-        seldays.value = this.date[kind].day;
-        selmonths.value = this.date[kind].month;
-        selyears.value = this.date[kind].year;
-        selhours.value = this.date[kind].hours;
-        selminutes.value = this.date[kind].minutes;
-
-        $('#'+picker).modal({
-            backdrop: false
-        });
-    };
-
-    this._setPicker = function(){
-
-        var now, 
-            newDate,
-            kind = this.currentPicker.getAttribute('data-pickr'),
-            hours = selhours.value || '00',
-            minutes = selminutes.value || '00',
-            date = {
-                day: seldays.options[seldays.selectedIndex].value,
-                month: selmonths.options[selmonths.selectedIndex].value,
-                year: selyears.options[selyears.selectedIndex].value,
-                hours: hours,
-                minutes: minutes
-                // hours: selhours.options[selhours.selectedIndex].value,
-                // minutes: selminutes.options[selminutes.selectedIndex].value
-            };
-        console.log(date);
-        if(!date.day || !date.month || !date.year) return;
-
-        now = Date.now();
-        newDate = new Date(date.year, date.month - 1, date.day, date.hours, date.minutes);
-        newDate = newDate.getTime();
-
-        // if(newDate > now){
-        //     alert(PbxObject.frases.pickrError1[PbxObject.lang]);
-        //     return;
-        // }
-
-        this.date[kind] = date;
-        this.pickers[kind].value = this._getStringDate(date);
-
-        $('#'+picker).modal('hide');
-
-    };
-
-    this._getStringDate = function(date){
-
-        var str = '';
-
-        str += date.day + '/'; 
-        str += date.month + '/';
-        str += date.year;
-        str += ' ';
-        str += date.hours + ':';
-        str += date.minutes;
-
-        return str;
-
-    };
-
-    this._addOption = function(el, val){
-        option = document.createElement('option');
-        option.value = val;
-        option.textContent = val;
-        el.appendChild(option);
-    };
-
-    this._getRecords = function(){
-        
-        var from = this.date.from,
-            to = this.date.to,
-            dbegin = new Date(from.year, from.month - 1, from.day, from.hours, from.minutes),
-            dend = new Date(to.year, to.month - 1, to.day, to.hours, to.minutes),
-            order, mode;
-
-        for(var i=0; i<elorder.length; i++){
-            if(elorder[i].checked)
-                order = elorder[i].value;
-        }
-        for(var i=0; i<elmode.length; i++){
-            if(elmode[i].checked)
-                mode = elmode[i].value;
-        }
-        
-        dbegin = dbegin.getTime();
-        dend = dend.getTime();
-
-        if(dbegin > dend){
-            alert(PbxObject.frases.pickrError2[PbxObject.lang]);
-            return;
-        }
-
-        var params = '';
-        params += '"begin": ' + dbegin;
-        params += ', "end": ' + dend;
-        if(number.value)
-            params += ', "number": "' + number.value + '"';
-        if(trunk.value)
-            params += ', "trunk": "' + trunk.value + '"';
-        // if(rows.value)
-        //     params += ', "limit": ' + parseInt(rows.value);
-        if(mode)
-            params += ', "mode": ' + mode;
-        if(order)
-            params += ', "order": ' + order;
-
-        // params = JSON.stringify(params);
-        console.log(params);
-        json_rpc_async('getCalls', params, this._showRecords.bind(this));
-
-    };
-
-    this._showRecords = function(result){
-        console.log(result);
-
-        // if(!rows.value && result.length > 50) rows.value = 50;
-        var rlength = rows.value ? parseInt(rows.value) : result.length,
-            pagnum = result.length > rlength ? Math.ceil(result.length / rlength) : 0,
-            pagin = document.querySelector('.pagination');
-
-        this.records = result;
-
-        while (table.hasChildNodes()) {
-            table.removeChild(table.firstChild);
-        }
-
-        while (pagin.hasChildNodes()) {
-            pagin.removeChild(pagin.firstChild);
-        }
-
-        if(pagnum > 0){
-            for (var i = 1; i <= pagnum; i++) {
-                var li = document.createElement('li'),
-                a = '<a href="#">'+i+'</a>';
-                li.innerHTML = a;
-                addEvent(li, 'click', this._paginRecords.bind(this));
-                pagin.appendChild(li);
-            }
-        }
-
-        for (var i = 0; i < rlength; i++) {
-            build_records_row(result[i], table);
-        };
-
-        var key, cost = 0;
-        for (var i = 0; i < result.length; i++) {
-            for(key in result[i]){
-                if(key == 'ch'){
-                    cost += result[i][key];
-                }
-            }
-        };
-
-        $('#sample-data').show();
-        $('#sample-length').text(result.length);
-        $('#sample-cost').text(cost);
-
-    }
-
-    this._paginRecords = function(e){
-
-        e.preventDefault();
-
-        var targ = e.target;
-            ind = parseInt(targ.textContent) * parseInt(rows.value) - parseInt(rows.value),
-            len = targ.textContent * parseInt(rows.value);
-
-        len = len < this.records.length ? len : this.records.length;
-
-        while (table.hasChildNodes()) {
-            table.removeChild(table.firstChild);
-        }
-        for (var i = ind; i < len; i++) {
-            build_records_row(this.records[i], table);
-        };
-
-    }
-
-    this._init();
-
- }
-
-function load_records(){
-
-    var pickers = document.querySelectorAll('.dt-pickr');
-    PbxObject.RecViewer = new RecViewer(pickers);
-    $('#sample-data').hide();
-    $('#search-calls .panel-body').slideToggle();
-    $('#extendedsearch').click(function(e){
-        e.preventDefault();
-        var $panel = $(this).closest('.panel'),
-            $el = $panel.find('.panel-body');
-
-        if(($el).is(':visible')){
-            $(this).text(PbxObject.frases.more[PbxObject.lang]);
-        }
-        else{
-            $(this).text(PbxObject.frases.less[PbxObject.lang]);
-        }
-
-        $el.slideToggle();
-    });
-
-}
-
-function build_records_row(data, table){
-
-    var cell,
-        lrow = table.rows.length,
-        row = table.insertRow(lrow),
-        ts = parseInt(data['ts']),
-        date = new Date(ts),
-        day = date.getDate() < 10 ? '0' + date.getDate() : date.getDate(),
-        month = date.getMonth() < 10 ? '0' + (date.getMonth()+1) : date.getMonth()+1,
-        hours = date.getHours() < 10 ? '0' + date.getHours() : date.getHours(),
-        minutes = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes(),
-        time = data['td'], h, m, s;
-
-    cell = row.insertCell(0);
-    date = day + '/' + month + '/' + date.getFullYear() + ' ' + hours + ':' + minutes;
-    cell.textContent = date;
-
-    cell = row.insertCell(1);
-    cell.textContent = data['na'];
-
-    cell = row.insertCell(2);
-    cell.textContent = data['nb'];
-
-    cell = row.insertCell(3);
-    cell.textContent = data['nc'];
-
-    cell = row.insertCell(4);
-    if(data['ta']) cell.textContent = data['ta'];
-
-    cell = row.insertCell(5);
-    if(data['tb']) cell.textContent = data['tb'];
-
-    cell = row.insertCell(6);
-    h = Math.floor(time / 3600);
-    time = time - h * 3600;
-    m = Math.floor(time / 60);
-    s = time - m * 60;
-    cell.textContent = (h < 10 ? '0'+h : h) + ':' + (m < 10 ? '0'+m : m) + ':' + (s < 10 ? '0'+s : s);
-
-    cell = row.insertCell(7);
-    cell.textContent = getFriendlyCodeName(data['cs']);
-
-    cell = row.insertCell(8);
-    cell.textContent = data['tr'];
-
-    cell = row.insertCell(9);
-    cell.textContent = data['ch'];
-}
-
-function getFriendlyCodeName(code){
-
-    var name = '';
-    switch(code){
-        case '1':
-            name = PbxObject.frases.codes.one[PbxObject.lang];
-            break;
-        case '3':
-            name = PbxObject.frases.codes.three[PbxObject.lang];
-            break;
-        case '16':
-            name = PbxObject.frases.codes.sixteen[PbxObject.lang];
-            break;
-        case '17':
-            name = PbxObject.frases.codes.seventeen[PbxObject.lang];
-            break;
-        case '18':
-            name = PbxObject.frases.codes.eighteen[PbxObject.lang];
-            break;
-        case '19':
-            name = PbxObject.frases.codes.nineteen[PbxObject.lang];
-            break;
-        case '21':
-            name = PbxObject.frases.codes.twentyone[PbxObject.lang];
-            break;
-        case '22':
-            name = PbxObject.frases.codes.twentytwo[PbxObject.lang];
-            break;
-        case '28':
-            name = PbxObject.frases.codes.twentyeight[PbxObject.lang];
-            break;
-        default:
-            name = code;
-    }
-    return name;
-
-}
-
 /* 
  * Setting ui for PBX group
  */
 
 function load_bgroup(result){
     console.log(result);
-    switch_tab(result.kind);
-    var i, cl, enabled, 
-        d = document, 
-        kind = result.kind, 
-        options = d.getElementById('options');
+    switch_presentation(result.kind);
 
-    PbxObject.oid = result.oid;
-    PbxObject.kind = kind;
-    PbxObject.name = result.name;
+    ProjectML.oid = result.oid;
+    ProjectML.kind = result.kind;
+    ProjectML.name = result.name;
 
-    if(kind == 'conference'){
-        var formats = [ "OFF", "320x240", "352x288", "640x360", "640x480", "704x576", "1024x768", "1280x720", "1920x1080" ];
-        PbxObject.videomax = result.maxvideomode;
-    }
-    enabled = document.getElementById('enabled');
-    if(enabled)
-        enabled.checked = result.enabled;
-    fill_list_items('available', result.available);
-    fill_list_items('members', result.members);
-
-    d.getElementById('extensions').parentNode.style.display = '';
-    if(kind == 'icd' || kind == 'conference'){
-        if(kind == 'icd') {
-            cl = 'conf-options';
-        }
-        else cl = 'icd-options';
-        var p = options.getElementsByClassName(cl);
-        i = p.length;
-        while(i--){
-            var col = p[i].parentNode;
-            col.parentNode.removeChild(col);
-        }
-        var profile = d.getElementById('profile');
-        profile.parentNode.removeChild(profile);
-    }
-    else {
-        options.parentNode.removeChild(options);
-    }
+    var select, option;
+    var d = document;
+    var kind = result.kind;
+    var cont = d.getElementById('dcontainer');
+    var greet = d.getElementById("playgreet");
+    var options = d.getElementById('options');
+    var enabled = document.getElementById('enabled');
+    var formats = [ "OFF", "320x240", "352x288", "640x360", "640x480", "704x576", "1024x768", "1280x720", "1920x1080" ];
 
     if(result.name) {
         d.getElementById('objname').value = result.name;
     }
+    if(enabled) enabled.checked = result.enabled;
+    
+    if(result.available) fill_list_items('available', result.available);
+    if(result.members) fill_list_items('members', result.members);
+
+    if(kind == 'users') {
+        var table = d.getElementById('extensions').querySelector('tbody');
+        /***TODO***/
+    }
     if(result.options){
-        if(kind == 'equipment'){
-            var eqtype = result.options.kind || 'ipphones';
-            d.getElementById(eqtype).checked = true;
-            if(result.options.kind == 'gateway'){
-                d.getElementById('regname').value = result.options.regname || '';
-                d.getElementById('regpass').value = result.options.regpass || '';
-            }
-            else if(result.options.kind == 'trunk'){
-                d.getElementById('username').value = result.options.regname || '';
-                d.getElementById('password').value = result.options.regpass || '';
-                d.getElementById('address').value = result.options.address || '';
-            }
-            d.getElementById('phonelines').value = result.options.phonelines || '1';
-            if(result.options.starflash != undefined){
-                d.getElementById('starflash').checked = result.options.starflash;
-            }
+        if(kind == 'hunting'){
+            if(result.options.timeout) d.getElementById("timeout2").value = result.options.timeout;
+            if(result.options.huntmode) d.getElementById("huntmode2").selectedIndex = result.options.huntmode;
         }
-        else if(kind == 'unit'){
-            d.getElementById("groupno1").value = result.options.groupno || '';
-            d.getElementById("timeout1").value = result.options.timeout || '';
-            if(result.options.huntmode)
-                d.getElementById("huntmode1").selectedIndex = result.options.huntmode;
-            if(result.options.huntfwd)
-                d.getElementById("huntfwd1").checked = result.options.huntfwd;
-        }
-        else if(kind == 'hunting'){
-            if(result.options.timeout)
-                d.getElementById("timeout2").value = result.options.timeout;
-            if(result.options.huntmode)
-                d.getElementById("huntmode2").selectedIndex = result.options.huntmode;
-            if(result.options.huntfwd)
-                d.getElementById("huntfwd2").checked = result.options.huntfwd;
-        }
-        else if(kind == 'pickup'){
-            d.getElementById("groupno2").value = result.options.groupno || '';
-        }
-        else if(kind == 'icd'){
-            d.getElementById("groupno").value = result.options.groupno || '';
-            d.getElementById("maxlines").value = result.options.maxlines || '';
-            d.getElementById("priority").value = result.options.priority || '';
-            d.getElementById("canpickup").checked = result.options.canpickup;
-            d.getElementById("autologin").checked = result.options.autologin;
-            d.getElementById("method").selectedIndex = result.options.method;
-            d.getElementById("natimeout").value = result.options.natimeout || '';
-            d.getElementById("resumetime").value = result.options.resumetime || '';
-            d.getElementById("queuelen").value = result.options.queuelen || '';
-            d.getElementById("maxqwait").value = result.options.maxqwait || '';
-            d.getElementById("overflowredirect").value = result.options.overflowredirect || '';
-            d.getElementById("overtimeredirect").value = result.options.overtimeredirect || '';
-            d.getElementById("indicationmode").value = result.options.indicationmode || '';
-            d.getElementById("indicationtime").value = result.options.indicationtime || '';
-            
-            //customizing upload element
-            customize_upload('greeting', result.options.greeting);
-        }
-        else if(kind == 'conference'){
-            //customizing upload element
+        else if(kind == 'conference' || kind == 'channel' || kind == 'selector'){
+            ProjectML.videomax = result.maxvideomode;
+
             customize_upload('onhold2', null);
             customize_upload('greeting2', null);
             
+            var numbers = result.numbers;
+            if(numbers) {
+                numbers = numbers.sort();
+                select = d.getElementById("in-number");
+                numbers.forEach(function(item, index){
+                    option = '<option value"'+item+'">'+item+'</option>';
+                    select.innerHTML += option;
+                });
+            }
+
+            if(kind == 'channel') {
+                var types = [].slice.call(cont.querySelectorAll('[name="objectType"]'));
+                /***TODO***/
+            }
+
             d.getElementById("dialuptt").value = result.options.dialtimeout || '';
             d.getElementById("autoredial").checked = result.options.autoredial;
-            d.getElementById("confrecord").checked = result.options.recording;
-            var greet = d.getElementById("playgreet");
+        
             greet.checked = result.options.greeting;
-            if(greet.checked) 
-                greet.checked = result.options.greetingfile ? true : false;
+            if(greet.checked) greet.checked = result.options.greetingfile ? true : false;
                 
-            var modes = d.getElementById("conf-init-mode").getElementsByClassName('init-mode');
-            for(i=0;i<modes.length;i++){
-                if(result.options.initmode == modes[i].value){
-                    modes[i].checked = true;
+            var modes = [].slice.call(cont.querySelectorAll('.init-mode'));
+            modes.forEach(function(item){
+                if(result.options.initmode == item.value){
+                    item.checked = true;
                 }
-            }
-            var select = d.getElementById("videoform");
-            for(i=0;i<formats.length;i++){
-                var op = d.createElement('option');
-                op.value = formats[i];
-                op.innerHTML = formats[i];
-                select.appendChild(op);
+            });
+
+            select = d.getElementById("videoform");
+            for(var i=0;i<formats.length;i++){
+                option = d.createElement('option');
+                option.value = formats[i];
+                option.innerHTML = formats[i];
+                select.appendChild(option);
                 if(formats[i] == result.options.videomode) {
                     select.selectedIndex = i;
                 }
@@ -709,27 +86,17 @@ function load_bgroup(result){
             }
         }
     }
-
-    if(result.profile != undefined){
+    if(result.profile){
         d.getElementById('hold').checked = result.profile.hold;
-        d.getElementById('forwarding').checked = result.profile.forwarding;
-        d.getElementById('callpickup').checked = result.profile.callpickup;
-        d.getElementById('dndover').checked = result.profile.dndover;
         d.getElementById('busyover').checked = result.profile.busyover;
         d.getElementById('monitor').checked = result.profile.monitor;
-        d.getElementById('dnd').checked = result.profile.dnd;
-        d.getElementById('clir').checked = result.profile.clir;
-        d.getElementById('pickupdeny').checked = result.profile.pickupdeny;
         d.getElementById('busyoverdeny').checked = result.profile.busyoverdeny;
         d.getElementById('monitordeny').checked = result.profile.monitordeny;
         d.getElementById('callwaiting').checked = result.profile.callwaiting;
-        d.getElementById('outcallbarring').checked = result.profile.outcallbarring;
-        d.getElementById('costroutebarring').checked = result.profile.costroutebarring;
-        d.getElementById('hold').checked = result.profile.hold;
 
         var transforms = result.profile.bnumbertransforms;
         if(transforms.length != 0){
-            for(i=0; i<transforms.length; i++){
+            for(var i=0; i<transforms.length; i++){
                 append_transform(null, 'transforms', transforms[i]);
             }
         }
@@ -752,26 +119,25 @@ function set_bgroup(){
     if(name)
         jprms = '"name":"'+name+'",';
     else{
-        alert(PbxObject.frases.missedNameField[PbxObject.lang]);
+        alert(ProjectML.frases.missedNameField[ProjectML.language]);
         return false;
     }
     
     show_loading_panel();
     
     var handler;
-    if(PbxObject.name) {
+    if(ProjectML.name) {
         handler = set_object_success;
     }
     else{
-        PbxObject.name = name;
-        // handler = set_new_object;
+        ProjectML.name = name;
         handler = null;
     }
 
-    var oid = PbxObject.oid;
+    var oid = ProjectML.oid;
     if(oid) jprms += '"oid":"'+oid+'",';
     
-    var kind = PbxObject.kind;
+    var kind = ProjectML.kind;
     if(kind) jprms += '"kind":"'+kind+'",';
     jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
     var members = d.getElementById('members');
@@ -788,50 +154,20 @@ function set_bgroup(){
         if(d.getElementById("hold") != null){
             jprms += '"hold":'+d.getElementById("hold").checked+",";
         }
-        if(d.getElementById("forwarding") != null){
-            jprms += '"forwarding":'+d.getElementById("forwarding").checked+",";
-        }
-        if(d.getElementById("callpickup") != null){
-            jprms += '"callpickup":'+d.getElementById("callpickup").checked+",";
-        }
-        if(d.getElementById("dndover") != null){
-            jprms += '"dndover":'+d.getElementById("dndover").checked+",";
-        }
         if(d.getElementById("busyover") != null){
             jprms += '"busyover":'+d.getElementById("busyover").checked+",";
         }
         if(d.getElementById("monitor") != null){
             jprms += '"monitor":'+d.getElementById("monitor").checked+",";
         }
-        if(d.getElementById("dnd") != null){
-            jprms += '"dnd":'+d.getElementById("dnd").checked+",";
-        }
-        if(d.getElementById("clir") != null){
-            jprms += '"clir":'+d.getElementById("clir").checked+",";
-        }
         if(d.getElementById("callwaiting") != null){
             jprms += '"callwaiting":'+d.getElementById("callwaiting").checked+",";
-        }
-        if(d.getElementById("pickupdeny") != null){
-            jprms += '"pickupdeny":'+d.getElementById("pickupdeny").checked+",";
         }
         if(d.getElementById("monitordeny") != null){
             jprms += '"monitordeny":'+d.getElementById("monitordeny").checked+",";
         }
         if(d.getElementById("busyoverdeny") != null){
             jprms += '"busyoverdeny":'+d.getElementById("busyoverdeny").checked+",";
-        }
-        if(d.getElementById("recording") != null){
-            jprms += '"recording":'+d.getElementById("recording").checked+",";
-        }
-        if(d.getElementById("voicemail") != null){
-            jprms += '"voicemail":'+d.getElementById("voicemail").checked+",";
-        }
-        if(d.getElementById("outcallbarring") != null){
-            jprms += '"outcallbarring":'+d.getElementById("outcallbarring").checked+",";
-        }
-        if(d.getElementById("costroutebarring") != null){
-            jprms += '"costroutebarring":'+d.getElementById("costroutebarring").checked+",";
         }
 
         var table = d.getElementById('transforms').getElementsByTagName('tbody')[0];
@@ -843,62 +179,11 @@ function set_bgroup(){
         jprms += '},';
     }
     jprms += '"options":{';
-    if(kind == 'equipment'){
-        if(d.getElementById("ipphones").checked){
-            jprms += '"kind":"ipphones",';
-        }
-        else if(d.getElementById("gateway").checked){
-            jprms += '"kind":"gateway",';
-            jprms += '"regname":"'+d.getElementById("regname").value+'",';
-            jprms += '"regpass":"'+d.getElementById("regpass").value+'",';
-        }
-        else if(d.getElementById("trunk").checked){
-            jprms += '"kind":"trunk",';
-            jprms += '"address":"'+d.getElementById("address").value+'",';
-            jprms += '"regname":"'+d.getElementById("username").value+'",';
-            jprms += '"regpass":"'+d.getElementById("password").value+'",';
-        }
-        if(d.getElementById("phonelines") != null){
-            jprms += '"phonelines":'+d.getElementById("phonelines").value+',';
-        }
-        if(d.getElementById("starflash") != null){
-            jprms += '"starflash":'+d.getElementById("starflash").checked+',';
-        }
-    }
-    else if(kind == 'unit'){
-        jprms += '"groupno":"'+d.getElementById("groupno1").value+'",';
-        jprms += '"timeout":'+d.getElementById("timeout1").value+',';
-        jprms += '"huntmode":'+d.getElementById("huntmode1").value+',';
-        jprms += '"huntfwd":'+d.getElementById("huntfwd1").checked+',';
-    }
-    else if(kind == 'hunting'){
+    
+    if(kind == 'hunting'){
         jprms += '"timeout":'+d.getElementById("timeout2").value+',';
         jprms += '"huntmode":'+d.getElementById("huntmode2").value+',';
         jprms += '"huntfwd":'+d.getElementById("huntfwd2").checked+',';
-    }
-    else if(kind == 'pickup'){
-        jprms += '"groupno":"'+d.getElementById("groupno2").value+'",';
-    }
-    else if(kind == 'icd'){
-        jprms += '"groupno":"'+d.getElementById("groupno").value+'",';
-        jprms += '"maxlines":'+d.getElementById("maxlines").value+',';
-        jprms += '"priority":'+d.getElementById("priority").value+',';
-        jprms += '"canpickup":'+d.getElementById("canpickup").checked+',';
-        jprms += '"autologin":'+d.getElementById("autologin").checked+',';
-        jprms += '"method":'+d.getElementById("method").value+',';
-        jprms += '"natimeout":'+d.getElementById("natimeout").value+',';
-        jprms += '"resumetime":'+d.getElementById("resumetime").value+',';
-        jprms += '"queuelen":'+d.getElementById("queuelen").value+',';
-        jprms += '"overflowredirect":"'+d.getElementById("overflowredirect").value+'",';
-        jprms += '"maxqwait":'+d.getElementById("maxqwait").value+',';
-        jprms += '"overtimeredirect":"'+d.getElementById("overtimeredirect").value+'",';
-        jprms += '"indicationmode":'+d.getElementById("indicationmode").value+',';
-        jprms += '"indicationtime":'+d.getElementById("indicationtime").value+',';
-        var file = document.getElementById("greeting");
-        if(file.value){
-            jprms += '"greeting":"'+file.files[0].name+'",';
-            upload('greeting');
-        }
     }
     else if(kind == 'conference'){
         jprms += '"dialtimeout":'+d.getElementById("dialuptt").value+',';
@@ -931,7 +216,7 @@ function set_bgroup(){
 }
 
 function fill_list_items(listid, items){
-    if(listid == 'available' || (PbxObject.kind != 'hunting' && PbxObject.kind != 'icd' && PbxObject.kind != 'unit')) {
+    if(listid == 'available' || (ProjectML.kind != 'hunting')) {
         items.sort();
     }
     var list = document.getElementById(listid);
@@ -955,299 +240,6 @@ function move_list_item(){
         parent.removeChild(li);
         document.getElementById('available').appendChild(li);
     }
-}
-
-/* 
- * UI for PBX applications
- */
-
-function load_application(result){
-    PbxObject.oid = result.oid;
-    PbxObject.name = result.name;    
-    if(result.name){
-        document.getElementById('objname').value = result.name;
-    }
-    if(result.enabled)
-        document.getElementById('enabled').checked = result.enabled;
-    if(result.debug)
-        document.getElementById('debug').checked = result.debug;
-    if(result.status)
-        document.getElementById('status').innerHTML = result.status;
-    if(result.dbconnection){
-        var db = result.dbconnection;
-        if(db.driver == 'sun.jdbc.odbc.JdbcOdbcDriver'){
-            document.getElementById('odbc').checked = true;
-            if(db.url)
-                document.getElementById('odbcurl').value = db.url;
-        }
-        else if(db.driver){
-            document.getElementById('jdbc').checked = true;
-            document.getElementById('jdbcdriver').value = db.driver;
-            if(db.url)
-                document.getElementById('jdbcurl').value = db.url;
-        }
-        if(db.schema)
-            document.getElementById('dbowner').value = db.schema;
-        if(db.username)
-            document.getElementById('dbuser').value = db.username;
-        if(db.password)
-            document.getElementById('dbpass').value = db.password;
-    }
-    
-    var vars = result.parameters;
-    if(vars.length){
-        for(var i=0; i<vars.length; i++){
-            add_app_row(vars[i]);
-        }
-    }
-    else{
-        add_app_row();
-    }
-    
-    show_content();
-    set_page();
-}
-
-//function set_object(){
-function set_application(){
-    show_loading_panel();
-    
-    if(PbxObject.oid) jprms += '"oid":"'+PbxObject.oid+'",';
-    var jprms = '\"name\":\"'+document.getElementById('objname').value+'\",';
-    jprms += '"enabled":'+document.getElementById('enabled').checked+',';
-    if(PbxObject.oid) jprms += '\"oid\":\"'+PbxObject.oid+'\",';
-    
-    var tbody = document.getElementById('appvariables').getElementsByTagName('tbody')[0];
-    jprms += '\"parameters\":[';
-    var i, j;
-    for(i=0; i<tbody.children.length; i++){
-        var tr = tbody.children[i];
-        var inputs = tr.getElementsByTagName('input');
-        var str = '';
-        for(j=0;j<inputs.length;j++){
-            if(inputs[j].name == 'variable'){
-                str += '"key":"'+inputs[j].value+'",';
-            }
-            else if(inputs[j].name == 'value') {
-                str += '"value":"'+inputs[j].value+'",';
-            }
-            else 
-                continue;
-        }
-        if(str != '') {
-            jprms += '{'+str+'},';
-        }
-    }
-    jprms += '],';
-    jprms += '"debug":'+document.getElementById('debug').checked+',';
-    jprms += '"dbconnection":{';
-    var driver, url;
-    if(document.getElementById('odbc').checked){
-        driver = 'sun.jdbc.odbc.JdbcOdbcDriver';
-        url = document.getElementById('odbcurl').value;
-    }
-    else{
-        driver = document.getElementById('jdbcdriver').value;
-        url = document.getElementById('jdbcurl').value;
-    }
-    jprms += '"driver":"'+driver+'",';
-    jprms += '"url":"'+url+'",';
-    
-    if(document.getElementById('dbowner'))
-        jprms += '"schema":"'+document.getElementById('dbowner').value+'",';
-    if(document.getElementById('dbuser'))
-        jprms += '"username":"'+document.getElementById('dbuser').value+'",';
-    if(document.getElementById('dbpass'))
-        jprms += '"password":"'+document.getElementById('dbpass').value+'",';
-    jprms += '},';
-    
-    json_rpc_async('setObject', jprms, set_object_success);
-}
-
-function add_app_row(object){
-    
-    var table = document.getElementById('appvariables').getElementsByTagName('tbody')[0];
-    var tr = document.createElement('tr');
-    
-    var td = document.createElement('td');
-    var div = document.createElement('div');
-    div.className = 'form-group';
-    var cell = document.createElement('input');
-    cell.className = 'form-control';
-    cell.setAttribute('type', 'text');
-    cell.setAttribute('name', 'variable');
-    cell.setAttribute('disabled', 'disabled');
-    if(object && object.key) cell.value = object.key;
-    div.appendChild(cell);
-    td.appendChild(div);
-    tr.appendChild(td);
-    table.appendChild(tr);
-    
-    td = document.createElement('td');
-    div = document.createElement('div');
-    div.className = 'form-group';
-    cell = document.createElement('input');
-    cell.className = 'form-control';
-    cell.setAttribute('name', 'value');
-    if(object && object.value) cell.value = object.value;
-    div.appendChild(cell);
-    td.appendChild(div);
-    tr.appendChild(td);
-    table.appendChild(tr);
-    
-    table.appendChild(tr);
-}
-
-/* 
- * UI from CLI group
- */
-
-//function load_object(result){
-function load_cli(result){
-    PbxObject.oid = result.oid;
-    PbxObject.name = result.name;
-    PbxObject.kind = 'cli';
-    if(result.name) {
-        document.getElementById('objname').value = result.name;
-    }
-    
-    document.getElementById('enabled').checked = result.enabled;
-    
-    var transforms = result.bnumbertransforms;
-    if(transforms.length) {
-        for(var i=0; i<transforms.length; i++){
-            append_transform(null, 'transforms1', transforms[i]);
-        }
-    }
-    else { 
-        append_transform(null, 'transforms1');
-    }
-    
-    var numbers = result.numbers;
-    if(numbers.length){
-        for(i=0; i<numbers.length; i++){
-            add_cli_row(numbers[i]);
-        }
-    }
-    else{
-        add_cli_row();
-    }
-
-    show_content();
-    set_page();
-}
-
-function set_cli(){
-        
-    var name = document.getElementById('objname').value;
-    if(name)
-        var jprms = '\"name\":\"'+name+'\",';
-    else{
-        alert('Object name must be filled');
-        return false;
-    }
-        
-    show_loading_panel();
-    
-    var handler;
-    if(PbxObject.name) {
-        handler = set_object_success;
-    }
-    else{
-        PbxObject.name = name;
-        // handler = set_new_object;
-        handler = null;
-    }
-    
-    if(PbxObject.oid) jprms += '\"oid\":\"'+PbxObject.oid+'\",';
-    jprms += '\"kind\":\"cligroup\",';
-    jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
-    
-    jprms += '\"bnumbertransforms\":[';
-    jprms += encode_transforms('transforms1');
-    jprms += '],';
-    
-    jprms += '\"numbers\":[';
-    var i, tbody = document.getElementById('clinumbers').getElementsByTagName('tbody')[0];
-    for(i=0; i<tbody.children.length; i++){
-        var tr = tbody.children[i];
-        var str = '';
-        
-        var inp = tr.getElementsByTagName('input')[0];
-        if(inp && inp.name == 'number') {
-            str += '"number":"'+inp.value+'",';
-        }
-        var ta = tr.getElementsByTagName('textarea')[0];
-        if(ta && ta.name == 'description') {
-            str += '"description":"'+ta.value+'",';
-        }
-        
-        if(str != '') {
-            jprms += '{'+str+'},';
-        }
-    }
-    jprms += ']';
-        
-    json_rpc_async('setObject', jprms, handler);     
-}
-
-function add_cli_row(object){
-    
-    var e = e || window.event;
-    if(e.type == 'click')
-        e.preventDefault();
-
-    var table = document.getElementById('clinumbers').getElementsByTagName('tbody')[0],
-        lrow = table.rows.length,
-        row = table.insertRow(lrow),
-        cell, div, inp;
-    // var tr = document.createElement('tr');
-    
-    // var td = document.createElement('td');
-    cell = row.insertCell(0);
-    div = document.createElement('div');
-    div.className = 'form-group';
-    inp = document.createElement('input');
-    inp.className = 'form-control';
-    inp.setAttribute('type', 'text');
-    inp.setAttribute('name', 'number');
-    if(object && object.number) inp.value = object.number;
-    div.appendChild(inp);
-    cell.appendChild(div);
-    // tr.appendChild(td);
-    // table.appendChild(tr);
-    
-    // td = document.createElement('td');
-    cell = row.insertCell(1);
-    div = document.createElement('div');
-//    div.className = 'col-xs-6';
-    div.className = 'form-group';
-    inp = document.createElement('textarea');
-    inp.className = 'form-control y-resizable';
-    inp.setAttribute('rows', '3');
-//    cell.setAttribute('type', 'text');
-    inp.setAttribute('name', 'description');
-    if(object && object.description) inp.value = object.description;
-    div.appendChild(inp);
-    cell.appendChild(div);
-    // tr.appendChild(td);
-    // table.appendChild(tr);
-    
-    // td = document.createElement('td');
-    cell = row.insertCell(2);
-    div = document.createElement('div');
-    div.className = 'form-group';
-//    div.className = 'col-xs-2';
-    inp = document.createElement('a');
-    inp.href = '#';
-    // cell.setAttribute('type', 'checkbox');
-    inp.className = 'remove-clr';
-    inp.innerHTML = '<i class="glyphicon glyphicon-remove"></i>';
-    addEvent(inp, 'click', remove_row);
-    div.appendChild(inp);
-    cell.appendChild(div);
-    // tr.appendChild(td);
-    // table.appendChild(tr);
 }
 
 /* 
@@ -1286,43 +278,43 @@ function getInfoFromState(state, group){
 
 }
 
-function createExtRow(ext, oid, kind, status, name, group, reg){
+function createExtRow(data){
 
     var row = document.createElement('tr'),
         cell, a, newkind;
 
     cell = row.insertCell(0);
-    if(oid){
+    if(data.oid){
         a = document.createElement('a');
-        if(kind == 'user' || kind == 'phone') {
+        if(data.kind == 'user' || data.kind == 'phone') {
             a.href = '#';
             addEvent(a, 'click', get_extension);
         } else {
-            a.href = '#' + kind + '?' + oid;
+            a.href = '#' + data.kind + '?' + data.oid;
         }
-        a.textContent = ext;
+        a.textContent = data.ext;
         cell.appendChild(a);
     } else {
-        cell.textContent = ext;
+        cell.textContent = data.ext;
     }
     
     cell = row.insertCell(1);
-    cell.textContent = name || "";
+    cell.textContent = data.name || "";
 
     cell = row.insertCell(2);
-    cell.textContent = group || "";
+    cell.textContent = data.group || "";
     
     cell = row.insertCell(3);
-    cell.textContent = reg || "";
+    cell.textContent = data.reg || "";
 
     cell = row.insertCell(4);
-    cell.textContent = kind || "";
+    cell.textContent = data.kind || "";
 
     cell = row.insertCell(5);
-    cell.textContent = status || "";
+    cell.textContent = data.status || "";
 
     cell = row.insertCell(6);
-    if(kind == 'user' || kind == 'phone') {
+    if(data.kind == 'user' || data.kind == 'phone') {
         button = document.createElement('button');
         button.className = 'btn btn-primary btn-sm';
         button.innerHTML = '<i class="glyphicon glyphicon-edit"></i>';
@@ -1330,7 +322,7 @@ function createExtRow(ext, oid, kind, status, name, group, reg){
         cell.appendChild(button);
     }    
     cell = row.insertCell(7);
-    if(oid) {
+    if(data.oid) {
         button = document.createElement('button');
         button.className = 'btn btn-danger btn-sm';
         button.innerHTML = '<i class="glyphicon glyphicon-trash"></i>';
@@ -1344,98 +336,40 @@ function createExtRow(ext, oid, kind, status, name, group, reg){
 
 function load_extensions(result) {
     console.log(result);
-    var row, obj, oid, ext, kind, state, info, status, className, name, group, reg,
+    var row, obj, state, info,
         table = document.getElementById('extensions').getElementsByTagName('tbody')[0],
         fragment = document.createDocumentFragment();
 
-    PbxObject.extensions = result;
+    ProjectML.extensions = result;
 
     for(var i=0; i<result.length; i++){
 
         obj = result[i];
-
-        oid = obj.oid;
-        ext = obj.ext;
-        kind = obj.kind;
         state = obj.state;
-        group = obj.group;
-        info = getInfoFromState(state, group);
-        status = info.rstatus;
-        className = info.rclass;
-        name = obj.name;
-        reg = obj.reg;
+        info = getInfoFromState(state, obj.group);
+
+        data = {
+            oid: obj.oid,
+            ext: obj.ext,
+            kind: obj.kind,
+            group: obj.group,
+            status: info.rstatus,
+            name: obj.name,
+            reg: obj.reg
+        };
 
         // lrow = table.rows.length;
         // row = table.insertRow(lrow);
-        row = createExtRow(ext, oid, kind, status, name, group, reg);
-        row.id = ext;
-        row.setAttribute('data-oid', oid);
-        row.className = className;
+        row = createExtRow(data);
+        row.id = obj.ext;
+        row.setAttribute('data-oid', obj.oid);
+        row.className = info.rclass;
 
         fragment.appendChild(row);
 
-        // cell = row.insertCell(0);
-        // a = document.createElement('a');
-        // if(result[i].oid){
-        //     if(result[i].kind == 'user' || result[i].kind == 'phone'){
-        //         a.href = '#';
-        //         a.setAttribute('data-oid', result[i].oid);
-        //         addEvent(a, 'click', get_extension);
-        //     }
-        //     else{
-        //         a.href = '#' + result[i].kind + '?' + result[i].oid;
-        //     }
-                
-        // }
-        
-        // a.innerHTML = result[i].ext;
-        // cell.appendChild(a);
-        
-        // cell = row.insertCell(1);
-        // cell.innerHTML = result[i].name || "";
-        
-        // cell = row.insertCell(2);
-        // cell.innerHTML = result[i].group;
-        
-        // cell = row.insertCell(3);
-        // cell.innerHTML = result[i].reg;
-
-        // cell = row.insertCell(4);
-        // cell.innerHTML = result[i].kind;
-
-        // cell = row.insertCell(5);
-        // if(status) cell.innerHTML = status;
-        
-        // cell = row.insertCell(6);
-        // a = document.createElement('a');
-        // a.href = '#';
-        // a.innerHTML = '<i class="glyphicon glyphicon-pencil"></i>';
-        // addEvent(a, 'click', editExtension);
-        // cell.appendChild(a);
-
-        // cell = row.insertCell(7);
-        // button = document.createElement('button');
-        // button.className = 'btn btn-danger btn-sm';
-        // button.innerHTML = '<i class="glyphicon glyphicon-trash"></i>';
-        // if(state == -1){
-        //     button.setAttribute('disabled', 'true');
-        // }
-        // else{
-        //     addEvent(button, 'click', delete_extension);
-        // }
-        
-        // cell.appendChild(button);
     }
         
     table.appendChild(fragment);
-    // var ref = document.getElementById('extrefresh');
-    // ref.onclick = function(){
-    //     update_extansions();
-    // };
-    // var rep = document.getElementById('extrepeat');
-    // rep.onclick = function(){
-    //     set_update_interval();
-    // };
     var inputs = document.getElementsByClassName('el-search');
     if(inputs.length){
         for(i=0;i<inputs.length;i++){
@@ -1484,10 +418,10 @@ function updateExtension(data){
     // }
     cells[5].innerHTML = status;
 
-    for(var ext in PbxObject.extensions){
+    for(var ext in ProjectML.extensions){
 
-        if(PbxObject.extensions[ext].oid === data.oid || PbxObject.extensions[ext].ext === data.ext){
-            var ext = PbxObject.extensions[ext];
+        if(ProjectML.extensions[ext].oid === data.oid || ProjectML.extensions[ext].ext === data.ext){
+            var ext = ProjectML.extensions[ext];
             if(ext.state) ext.state = data.state;
             if(ext.name) ext.name = data.name;
             if(ext.group) ext.group = data.group;
@@ -1632,8 +566,8 @@ function load_extension(result){
     var d = document,
         groupid = result.groupid,
         kind = result.kind == 'user' ? 'users':'unit';
-    PbxObject.kind = kind;
-    PbxObject.oid = result.oid;
+    ProjectML.kind = kind;
+    ProjectML.oid = result.oid;
     
     
     document.getElementById('el-extension-num').innerHTML = 'Extension '+result.number;
@@ -1767,8 +701,8 @@ function set_extension(e){
     if(e.type == 'click')
         e.preventDefault();
     var d = document,
-        oid = PbxObject.oid,
-        kind = PbxObject.kind;
+        oid = ProjectML.oid,
+        kind = ProjectML.kind;
     
     var jprms = '\"oid\":\"'+oid+'\",';
     var group = d.getElementById("extgroup");
@@ -1848,98 +782,6 @@ function fill_group_choice(kind, groupid, select){
     }
 }
 
-// function update_extansions(event){
-//     var event = event || window.event;
-//     $('#extrefresh').addClass('spinner');
-//     json_rpc_async('getExtensions', null, update_extansions_);
-//     if(event) event.preventDefault();
-// }
-// function set_update_interval(event){
-//     var event = event || window.event;
-//     var button = document.getElementById('extrepeat');
-//     if(PbxObject.updext){
-//         clearInterval(PbxObject.updext);
-//         PbxObject.updext = false;
-//         if(button) button.className = '';
-//     }
-//     else{
-//         PbxObject.updext = setInterval(function(){update_extansions();}, 5000);
-//         if(button) button.className = 'nav-active';
-//     }
-//     event.preventDefault();
-// }
-
-// function update_extansions_(result){
-//     var obj, state, row, cells, status,
-//         table = document.getElementById('extensions');
-//         if(table) {
-//             var tbody = table.getElementsByTagName('tbody')[0],
-//                 trows = tbody.rows;
-//         }
-//         else 
-//             return;
-//     for(var i=0;i<result.length;i++){
-//         obj = result[i];
-//         state = obj.state;
-//         for(var j=0;j<trows.length;j++){
-//             row = trows[j];
-//             cells = row.cells;
-//             if(obj.ext == row.getAttribute('data-ext')){
-//                 if(state == 0){
-//                     status = 'Registered';
-//                     row.className = 'success';
-//                 }
-//                 else if(state == 3){
-//                     status = 'Connected';
-//                     row.className = 'connected';
-//                 }
-//                 else if(state == 6){
-//                     status = 'Forwarding';
-//                     row.className = 'warning';
-//                 }
-//                 else if(state == 5){
-//                     status = '';
-//                     row.className = '';
-//                 }
-//                 else if(state == 4){
-//                     status = 'Do not disturb';
-//                     row.className = 'danger';
-//                 }
-//                 else if(state == 1 || state == 2){
-//                     status = state == 1 ? 'Dialing' : 'Ringing';
-//                     row.className = 'info';
-//                 }
-//                 else{
-//                     status = '';
-//                     row.className = 'active';
-//                 }
-//                 if(cells[1].innerHTML != obj.name) {
-//                     cells[1].innerHTML = obj.name || "";
-//                 }
-//                 if(cells[2].innerHTML != obj.group) {
-//                     cells[2].innerHTML = obj.group;
-//                 }
-//                 if(cells[3].innerHTML != obj.reg) {
-//                     cells[3].innerHTML = obj.reg;
-//                 }
-//                 if(cells[4].innerHTML != obj.kind) {
-//                     cells[4].innerHTML = obj.kind;
-//                 }
-//                 if(cells[5].innerHTML != status) {
-//                     cells[5].innerHTML = status;
-//                 }
-//                 if(state == -1 && !cells[6].children[0].getAttribute('disabled')){
-//                     cells[6].children[0].setAttribute('disabled', 'disabled');
-//                 }
-//                 else if(state != -1 && cells[6].children[0].getAttribute('disabled')){
-//                     cells[6].children[0].removeAttribute('disabled');
-//                 }
-//             }
-//         }
-//     }
-//     $('#extrefresh').removeClass('spinner');
-// }
-
 /* 
  * UI for PBX routing tables
  */
@@ -1947,9 +789,9 @@ function fill_group_choice(kind, groupid, select){
 function load_routes(result){
     console.log(result);
     
-    PbxObject.oid = result.oid;
-    PbxObject.kind = 'routes';
-    PbxObject.routepriorities = [
+    ProjectML.oid = result.oid;
+    ProjectML.kind = 'routes';
+    ProjectML.routepriorities = [
         "Max. prefix length",
         "Least cost routing",
         "Load balancing",
@@ -1959,7 +801,7 @@ function load_routes(result){
         "Least utilised gateway",
         "Max. priority (status)"    
     ];
-    PbxObject.name = result.name;
+    ProjectML.name = result.name;
     if(result.name) {
         document.getElementById('objname').value = result.name;
     }
@@ -1972,7 +814,7 @@ function load_routes(result){
     for(i=0; i<priorities.length; i++){
         var li = document.createElement('li');
         li.setAttribute('data-value', priorities[i]);
-        li.innerHTML = PbxObject.routepriorities[priorities[i]];
+        li.innerHTML = ProjectML.routepriorities[priorities[i]];
         ul.appendChild(li);
     }
 
@@ -2017,16 +859,16 @@ function set_routes(){
     show_loading_panel();
     
     var handler;
-    if(PbxObject.name) {
+    if(ProjectML.name) {
         handler = set_object_success;
     }
     else{
-        PbxObject.name = name;
+        ProjectML.name = name;
         // handler = set_new_object;
         handler = null;
     }
     
-    if(PbxObject.oid) jprms += '\"oid\":\"'+PbxObject.oid+'\",';
+    if(ProjectML.oid) jprms += '\"oid\":\"'+ProjectML.oid+'\",';
     jprms += '\"kind\":\"routes\",';
     jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
  
@@ -2216,216 +1058,13 @@ function build_route_row(route, objects){
 }
 
 /* 
- * UI for PBX timers
- */
-
-function load_timer(result){
-    PbxObject.oid = result.oid;
-    PbxObject.name = result.name;
-    PbxObject.kind = 'timer';
-    
-    if(result.name){
-        document.getElementById('objname').value = result.name;
-    }
-    document.getElementById('enabled').checked = result.enabled;
-    var i;
-    var hours = document.getElementById('hh');
-    for(i=0;i<24;i++){
-        var opt = document.createElement('option');
-        if(i<10)
-            var value = '0'+i;
-        else
-            value = i;
-        opt.value = value;
-        opt.innerHTML = value;
-        hours.appendChild(opt);
-        if(value == result.hour) {
-            hours.selectedIndex = i;
-        }
-    }
-    var minutes = document.getElementById('mm');
-    for(i=0;i<=55;i+=5){
-        var opt = document.createElement('option');
-        if(i<10)
-            var value = '0'+i;
-        else
-            value = i;
-        opt.value = value;
-        opt.innerHTML = value;
-        minutes.appendChild(opt);
-        if(value == result.minute) {
-            minutes.selectedIndex = i/5;
-        }
-    }
-    for(i=0; i<result.weekdays.length; i++){
-        document.getElementById('d'+result.weekdays[i]).checked = true;
-    }
-    
-    fill_timer_targets('objects');
-    
-    var targets = document.getElementById('targets').getElementsByTagName('tbody')[0];
-    for(i=0; i < result.targets.length; i++){
-        targets.appendChild(timer_target_row(result.targets[i].oid, result.targets[i].name, result.targets[i].action));
-    }
-    
-    show_content();
-    set_page();
-
-    var add = document.getElementById('add-timer-target');
-    add.onclick = function(){
-        add_timer_target();
-    };
-    
-    var everyd = document.getElementById('timer-everyday');
-    addEvent(everyd, 'click', check_days);
-    var workd = document.getElementById('timer-workdays');
-    addEvent(workd, 'click', check_days);
-    var holid = document.getElementById('timer-holidays');
-    addEvent(holid, 'click', check_days);
-    
-}
-
-function set_timer(){
-        
-    var jprms, name = document.getElementById('objname').value;
-    if(name)
-        jprms = '\"name\":\"'+name+'\",';
-    else{
-        alert('Object name must be filled');
-        return false;
-    }
-    
-    show_loading_panel();
-    
-    var handler;
-    if(PbxObject.name) {
-        handler = set_object_success;
-    }
-    else{
-        PbxObject.name = name;
-        // handler = set_new_object;
-        handler = null;
-    }
-    
-    if(PbxObject.oid != null) {
-        jprms += '\"oid\":\"'+PbxObject.oid+'\",';
-    }
-    jprms += '\"kind\":\"timer\",';
-    var enabled = document.getElementById('enabled');
-    if(enabled != null) {
-        jprms += '\"enabled\":'+enabled.checked+',';
-    }
-    var h = document.getElementById('hh');
-    var m = document.getElementById('mm');
-    jprms += '\"hour\":\"'+h.options[h.selectedIndex].value+'\",';
-    jprms += '\"minute\":\"'+m.options[m.selectedIndex].value+'\",';
-
-    jprms += '\"weekdays\":[';
-    var i;
-    for(i=0; i<7; i++){
-        if(document.getElementById('d'+i).checked){
-            jprms += i+',';
-        }
-    }
-    jprms += '],';
-
-    var targets = document.getElementById('targets').getElementsByTagName('tbody')[0];
-    
-    jprms += '\"targets\":[';
-    for(i=0; i < targets.children.length; i++){
-        var tr = targets.children[i];
-        if(tr.id != undefined && tr.id != ''){
-            jprms += '{\"oid\":\"'+targets.children[i].id+'\",\"action\":\"'+tr.children[1].innerHTML+'\"},';
-        }
-    }
-    jprms += ']';
-    
-    json_rpc_async('setObject', jprms, handler); 
-}
-
-function timer_target_row(oid, name, action){
-    var tr = document.createElement('tr');
-    tr.id = oid;
-    var td = document.createElement('td');
-    var a = document.createElement('a');
-    a.href = '#';
-    a.onclick = function(e){
-        get_object_link(oid);
-        e.preventDefault();
-    };
-    a.innerHTML = name;
-    td.appendChild(a);
-    tr.appendChild(td);
-    td = document.createElement('td');
-    td.innerHTML = action;
-    tr.appendChild(td);
-    td = document.createElement('td');
-    var button = document.createElement('button');
-    button.className = 'btn btn-danger btn-sm';
-    button.innerHTML = 'Del';
-    button.onclick = function(){
-        remove_listener(oid);
-    };
-    td.appendChild(button);
-    tr.appendChild(td);
-    return tr;
-}
-
-function add_timer_target() {
-    var table = document.getElementsByTagName('tbody')[0];
-    var select = document.getElementById('objects');
-    var action = document.getElementById('actions');
-    var opt = select.options[select.selectedIndex];
-    table.appendChild(timer_target_row(opt.value, opt.innerHTML, action.value));
-}
-
-function remove_listener(oid){
-    var targets = document.getElementById('targets').getElementsByTagName('tbody')[0];
-    var i;
-    for(i=0; i < targets.children.length; i++){
-        if(targets.children[i].id == oid){
-            targets.removeChild(targets.children[i]);
-        }
-    }    
-}
-
-function fill_timer_targets(id){
-    var objects = document.getElementById(id);
-    var result = json_rpc('getObjects', '\"kind\":\"all\"');
-    for(var i=0; i<result.length; i++){
-        var kind = result[i].kind;
-        if(kind == 'equipment' || kind == 'cli' || kind == 'timer' || kind == 'users') {
-            continue;
-        }
-        var oid = result[i].oid;
-        var option = document.createElement('option');
-        option.value = oid;
-        option.innerHTML = result[i].name;
-        objects.appendChild(option);
-    }
-}
-
-function check_days(){
-    var i, day, id = this.id;
-
-    for(i=0;i<7;i++){
-        day = document.getElementById('d'+i);
-        if((id === 'timer-workdays' && (i===5 || i===6)) || (id === 'timer-holidays' && i<5)){
-            if(day.checked) day.checked = false;
-            continue;
-        }
-        day.checked = true;
-    }
-}
-
-/* 
  * UI for PBX trunks
  */
 
 function load_trunk(result){
-    PbxObject.oid = result.oid;
-    PbxObject.name = result.name;
-    PbxObject.kind = 'trunk';
+    ProjectML.oid = result.oid;
+    ProjectML.name = result.name;
+    ProjectML.kind = 'trunk';
     
     if(result.name)
         document.getElementById('objname').value = result.name;
@@ -2570,12 +1209,12 @@ function set_trunk(){
     show_loading_panel();
 
     var handler;
-    if(PbxObject.oid) jprms += '"oid":"'+PbxObject.oid+'",';
-    if(PbxObject.name) {
+    if(ProjectML.oid) jprms += '"oid":"'+ProjectML.oid+'",';
+    if(ProjectML.name) {
         handler = set_object_success;
     }
     else{
-        PbxObject.name = name;
+        ProjectML.name = name;
         // handler = set_new_object;
         handler = null;
     }

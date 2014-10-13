@@ -28,9 +28,9 @@
                             </div>
                         </div>
                         <div class="form-group">    
-                            <label for="domain" class="col-md-5 control-label">Домен</label>
+                            <label for="domain" class="col-md-5 control-label">IP Адреса/Домен</label>
                             <div class="col-md-4">
-                                <input type="text" class="form-control" id="domain" placeholder="Домен">
+                                <input type="text" class="form-control" id="domain" placeholder="IP Адреса/Домен">
                             </div>
                         </div>
                         <div class="form-group">
@@ -94,6 +94,138 @@
                             </div>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="prefixes">
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Вхідні виклики
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="inmode"> Дозволити вхідні виклики
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxinbounds" class="col-md-4">Макс. кільк. з'єднань</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxinbounds" placeholder="Макс. кільк. з'єднань">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms1">
+                            <thead>
+                                <tr><th colspan="5">Перетворення викликаючого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стріп</th>
+                                    <th>Префікс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms2">
+                            <thead>
+                                <tr><th colspan="5">Перетворення викликаємого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стріп</th>
+                                    <th>Префікс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-xs-12 col-custom">
+            <div class="panel">
+                <div class="panel-header">Вихідні виклики
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+                              <div class="checkbox">
+                                <label>
+                                  <input type="checkbox" id="outmode"> Дозволити вихідні виклики
+                                </label>
+                              </div>
+                            </div>
+                        </div>
+                        <div class="form-group">    
+                            <label for="maxoutbounds" class="col-md-4">Макс. кільк. з'єднань</label>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" id="maxoutbounds" placeholder="Макс. кільк. з'єднань">
+                            </div>
+                        </div>
+                    </form>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms3">
+                            <thead>
+                                <tr><th colspan="5">Перетворення викликаючого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стріп</th>
+                                    <th>Префікс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                        <table class="table" id="transforms4">
+                            <thead>
+                                <tr><th colspan="5">Перетворення викликаємого номера</th></tr>
+                                <tr>
+                                    <th>Номер</th>
+                                    <th>Стріп</th>
+                                    <th>Префікс</th>
+                                    <th>
+                                        <a href="" class="add-clr transrow">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                        </a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -308,138 +440,6 @@
                             </div>
                         </div>
                             
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row" id="prefixes">
-        <div class="col-md-6 col-xs-12 col-custom">
-            <div class="panel">
-                <div class="panel-header">Вхідні виклики
-                    <i class="glyphicon glyphicon-chevron-down"></i>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <div class="col-md-offset-4 col-md-8">
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" id="inmode"> Дозволити вхідні виклики
-                                </label>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="form-group">    
-                            <label for="maxinbounds" class="col-md-4">Макс. кільк. з'єднань</label>
-                            <div class="col-md-3">
-                                <input type="text" class="form-control" id="maxinbounds" placeholder="Макс. кільк. з'єднань">
-                            </div>
-                        </div>
-                    </form>
-                    <hr>
-                    <div class="table-responsive">
-                        <table class="table" id="transforms1">
-                            <thead>
-                                <tr><th colspan="5">Перетворення викликаючого номера</th></tr>
-                                <tr>
-                                    <th>Номер</th>
-                                    <th>Стріп</th>
-                                    <th>Префікс</th>
-                                    <th>
-                                        <a href="" class="add-clr transrow">
-                                            <i class="glyphicon glyphicon-plus"></i>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                    <hr>
-                    <div class="table-responsive">
-                        <table class="table" id="transforms2">
-                            <thead>
-                                <tr><th colspan="5">Перетворення викликаємого номера</th></tr>
-                                <tr>
-                                    <th>Номер</th>
-                                    <th>Стріп</th>
-                                    <th>Префікс</th>
-                                    <th>
-                                        <a href="" class="add-clr transrow">
-                                            <i class="glyphicon glyphicon-plus"></i>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 col-xs-12 col-custom">
-            <div class="panel">
-                <div class="panel-header">Вихідні виклики
-                    <i class="glyphicon glyphicon-chevron-down"></i>
-                </div>
-                <div class="panel-body">
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <div class="col-md-offset-4 col-md-8">
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" id="outmode"> Дозволити вихідні виклики
-                                </label>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="form-group">    
-                            <label for="maxoutbounds" class="col-md-4">Макс. кільк. з'єднань</label>
-                            <div class="col-md-3">
-                                <input type="text" class="form-control" id="maxoutbounds" placeholder="Макс. кільк. з'єднань">
-                            </div>
-                        </div>
-                    </form>
-                    <hr>
-                    <div class="table-responsive">
-                        <table class="table" id="transforms3">
-                            <thead>
-                                <tr><th colspan="5">Перетворення викликаючого номера</th></tr>
-                                <tr>
-                                    <th>Номер</th>
-                                    <th>Стріп</th>
-                                    <th>Префікс</th>
-                                    <th>
-                                        <a href="" class="add-clr transrow">
-                                            <i class="glyphicon glyphicon-plus"></i>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-
-                            </tbody>
-                        </table>
-                    </div>
-                    <hr>
-                    <div class="table-responsive">
-                        <table class="table" id="transforms4">
-                            <thead>
-                                <tr><th colspan="5">Перетворення викликаємого номера</th></tr>
-                                <tr>
-                                    <th>Номер</th>
-                                    <th>Стріп</th>
-                                    <th>Префікс</th>
-                                    <th>
-                                        <a href="" class="add-clr transrow">
-                                            <i class="glyphicon glyphicon-plus"></i>
-                                        </a>
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
                     </div>
                 </div>
             </div>
