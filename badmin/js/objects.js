@@ -17,21 +17,81 @@ function load_bgroup(result){
     var cont = d.getElementById('dcontainer');
     var greet = d.getElementById("playgreet");
     var options = d.getElementById('options');
+    // var incnum = d.getElementById("in-number");
     var enabled = document.getElementById('enabled');
     var formats = [ "OFF", "320x240", "352x288", "640x360", "640x480", "704x576", "1024x768", "1280x720", "1920x1080" ];
 
     if(result.name) {
         d.getElementById('objname').value = result.name;
     }
-    if(enabled) enabled.checked = result.enabled;
-    
-    if(result.available) fill_list_items('available', result.available);
-    if(result.members) fill_list_items('members', result.members);
-
-    if(kind == 'users') {
-        var table = d.getElementById('extensions').querySelector('tbody');
-        /***TODO***/
+    if(enabled) {
+        enabled.checked = result.enabled;
+        if(result.name) {
+            addEvent(enabled, 'change', function(){
+                console.log(result.oid+' '+this.checked);
+                json_rpc_async('setObjectState', '{\"oid\":\"'+result.oid+'\", \"enabled\":'+this.checked+'}', null); 
+            });
+        }
     }
+    
+    if(kind == 'users') {
+        var table = document.getElementById('group-extensions').querySelector('tbody');
+        var types = [].slice.call(cont.querySelectorAll('input[name="userType"]'));
+        var available = document.getElementById('available-users');
+        var form = document.getElementById('new-user-form').cloneNode(true);
+        var clear = document.getElementById('clear-input');
+        var add = document.getElementById('add-user');
+        var type;
+        types.forEach(function(item){
+            if(item.value == 'local') {
+                item.checked = true;
+                type = item.value;
+            }
+            addEvent(item, 'change', function(){
+                changeGroupType(item.value);
+                type = item.value;
+            });
+        });
+        if(result.available && result.available.length) {
+            result.available.sort().forEach(function(item){
+                var option = document.createElement('option');
+                option.value = item;
+                option.textContent = item;
+                available.appendChild(option);
+            });
+
+            addEvent(add, 'click', function(){
+                addUser(type);
+                cleanForm(form);
+            });
+            addEvent(clear, 'click', function(){
+                cleanForm(form);
+            });
+        } else {
+            add.setAttribute('disabled', 'disabled');
+        }
+        var num;
+        result.members.forEach(function(item){
+            if(!table.rows.length) {
+                table.appendChild(addMembersRow(item));
+            } else {
+                if(result.members.ext > num) {
+                    table.appendChild(addMembersRow(item));
+                } else {
+                    table.insertBefore(addMembersRow(item), table.rows[0]);
+                }
+            }
+            num = result.members.ext;
+        });
+        ProjectML.members = result.members || [];
+
+        changeGroupType(type);
+
+    } else {
+        if(result.available) fill_list_items('available', result.available);
+        if(result.members) fill_list_items('members', result.members);
+    }
+
     if(result.options){
         if(kind == 'hunting'){
             if(result.options.timeout) d.getElementById("timeout2").value = result.options.timeout;
@@ -43,19 +103,42 @@ function load_bgroup(result){
             customize_upload('onhold2', null);
             customize_upload('greeting2', null);
             
-            var numbers = result.numbers;
-            if(numbers) {
-                numbers = numbers.sort();
-                select = d.getElementById("in-number");
-                numbers.forEach(function(item, index){
-                    option = '<option value"'+item+'">'+item+'</option>';
-                    select.innerHTML += option;
-                });
-            }
+            // var numbers = result.numbers || result.number;
+            // if(numbers) {
+            //     if(typeof numbers === 'Array') {
+            //         numbers = numbers.sort();
+            //         numbers.forEach(function(item, index){
+            //             option = '<option value"'+item+'">'+item+'</option>';
+            //             incnum.innerHTML += option;
+            //         });    
+            //     } else {
+            //         option = '<option value"'+numbers+'">'+numbers+'</option>';
+            //         incnum.innerHTML += option;
+            //         incnum.setAttribute('readonly', true);       
+            //     }
+            // }
 
             if(kind == 'channel') {
-                var types = [].slice.call(cont.querySelectorAll('[name="objectType"]'));
-                /***TODO***/
+                var type, types = [].slice.call(cont.querySelectorAll('input[name="objectType"]')),
+                    external = document.getElementById('out-number');
+                types.forEach(function(item){
+                    if(result.external) {
+                        if(item.value == 'global') {
+                            item.checked = true;
+                            type = item.value;
+                        }
+                        external.value = result.external;
+                    } else {
+                        if(item.value == 'local') {
+                            item.checked = true;
+                            type = item.value;
+                        }
+                    }
+                    addEvent(item, 'change', function(){
+                        changeGroupType(item.value);
+                    });
+                });
+                changeGroupType(type);
             }
 
             d.getElementById("dialuptt").value = result.options.dialtimeout || '';
@@ -86,6 +169,7 @@ function load_bgroup(result){
             }
         }
     }
+
     if(result.profile){
         d.getElementById('hold').checked = result.profile.hold;
         d.getElementById('busyover').checked = result.profile.busyover;
@@ -112,12 +196,19 @@ function load_bgroup(result){
 
 function set_bgroup(){
 
-    var jprms,
-        d = document,
-        name = d.getElementById('objname').value;
+    var d = document;
+    // var incnum = document.getElementById('in-number');
+    var name = d.getElementById('objname').value;
+    var members = d.getElementById('members');
+    var greet = d.getElementById("playgreet");
+    var kind = ProjectML.kind;
+    var oid = ProjectML.oid;
+    var handler;
+    var type, types = [].slice.call(document.querySelectorAll('input[name="objectType"]'));
 
+    var jprms = '{';
     if(name)
-        jprms = '"name":"'+name+'",';
+        jprms += '"name":"'+name+'",';
     else{
         alert(ProjectML.frases.missedNameField[ProjectML.language]);
         return false;
@@ -125,7 +216,6 @@ function set_bgroup(){
     
     show_loading_panel();
     
-    var handler;
     if(ProjectML.name) {
         handler = set_object_success;
     }
@@ -134,86 +224,173 @@ function set_bgroup(){
         handler = null;
     }
 
-    var oid = ProjectML.oid;
     if(oid) jprms += '"oid":"'+oid+'",';
     
-    var kind = ProjectML.kind;
     if(kind) jprms += '"kind":"'+kind+'",';
     jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
-    var members = d.getElementById('members');
-    if(members){
+    if(kind != 'users'){
         jprms += '"members":[';
         for(var i=0; i<members.children.length; i++){
             jprms += '"'+members.children[i].innerHTML+'",';
         }
         jprms += '],';
     }
-    var profile = d.getElementById('profile');
-    if(profile){
-        jprms += '"profile":{';
-        if(d.getElementById("hold") != null){
-            jprms += '"hold":'+d.getElementById("hold").checked+",";
+    if(kind == 'users') {
+        jprms += '"members":[';
+        for(var i=0; i<ProjectML.members.length; i++) {
+            jprms += '"' + ProjectML.members[i].number + '",';
         }
-        if(d.getElementById("busyover") != null){
-            jprms += '"busyover":'+d.getElementById("busyover").checked+",";
-        }
-        if(d.getElementById("monitor") != null){
-            jprms += '"monitor":'+d.getElementById("monitor").checked+",";
-        }
-        if(d.getElementById("callwaiting") != null){
-            jprms += '"callwaiting":'+d.getElementById("callwaiting").checked+",";
-        }
-        if(d.getElementById("monitordeny") != null){
-            jprms += '"monitordeny":'+d.getElementById("monitordeny").checked+",";
-        }
-        if(d.getElementById("busyoverdeny") != null){
-            jprms += '"busyoverdeny":'+d.getElementById("busyoverdeny").checked+",";
-        }
-
-        var table = d.getElementById('transforms').getElementsByTagName('tbody')[0];
-        if(table){          
-            jprms += '"bnumbertransforms":[';
-            jprms += encode_transforms('transforms');
-            jprms += ']';
-        }
-        jprms += '},';
+        jprms += '],';
     }
+
+    // if(incnum && incnum.options.length) {
+    //     incnum = incnum.options[incnum.selectedIndex].value;
+    //     jprms += '"number":"'+incnum+'",';
+    // }
+    if(kind == 'channel') {
+        types.forEach(function(item){
+            if(item.checked) {
+                type = item.value;
+            }
+        });
+        if(type == 'global') {
+            greet.checked = false;
+            var outnum = document.getElementById('out-number');
+            jprms += '"external":"'+outnum.value+'",';
+        } else if(type == 'local') {
+
+        }
+    }
+
+    if(kind == 'users') {
+        var profile = d.getElementById('profile');
+        if(profile){
+            jprms += '"profile":{';
+            if(d.getElementById("hold") != null){
+                jprms += '"hold":'+d.getElementById("hold").checked+",";
+            }
+            if(d.getElementById("busyover") != null){
+                jprms += '"busyover":'+d.getElementById("busyover").checked+",";
+            }
+            if(d.getElementById("monitor") != null){
+                jprms += '"monitor":'+d.getElementById("monitor").checked+",";
+            }
+            if(d.getElementById("callwaiting") != null){
+                jprms += '"callwaiting":'+d.getElementById("callwaiting").checked+",";
+            }
+            if(d.getElementById("monitordeny") != null){
+                jprms += '"monitordeny":'+d.getElementById("monitordeny").checked+",";
+            }
+            if(d.getElementById("busyoverdeny") != null){
+                jprms += '"busyoverdeny":'+d.getElementById("busyoverdeny").checked+",";
+            }
+
+            var table = d.getElementById('transforms').getElementsByTagName('tbody')[0];
+            if(table){          
+                jprms += '"bnumbertransforms":[';
+                jprms += encode_transforms('transforms');
+                jprms += ']';
+            }
+
+            jprms += '},';
+        }
+    }
+        
     jprms += '"options":{';
     
     if(kind == 'hunting'){
         jprms += '"timeout":'+d.getElementById("timeout2").value+',';
         jprms += '"huntmode":'+d.getElementById("huntmode2").value+',';
-        jprms += '"huntfwd":'+d.getElementById("huntfwd2").checked+',';
     }
-    else if(kind == 'conference'){
-        jprms += '"dialtimeout":'+d.getElementById("dialuptt").value+',';
+    else if(kind == 'conference' || kind == 'channel' || kind == 'selector'){
+        if(kind !== 'channel')  jprms += '"dialtimeout":'+d.getElementById("dialuptt").value+',';
         jprms += '"autoredial":'+d.getElementById("autoredial").checked+',';
-        jprms += '"recording":'+d.getElementById("confrecord").checked+',';
         jprms += '"videomode":"'+d.getElementById("videoform").value+'",';
-        var greet = d.getElementById("playgreet");
-        jprms += '"greeting\":'+greet.checked+',';
+        jprms += '"greeting":'+greet.checked+',';
         file = document.getElementById("greeting2");
-        if(greet.checked && file.value){
+
+        /*TODO - ignore greeting when global channel group is set*/
+        if(greet.checked && file.value) {
             jprms += '"greetingfile":"'+file.files[0].name+'",';
             upload('greeting2');
         }
-        var modes = d.getElementById("conf-init-mode").getElementsByClassName('init-mode');
-        for(i=0;i<modes.length;i++){
-            if(modes[i].checked) {
-                jprms += '"initmode":'+modes[i].value+',';
-                if(modes[i].value == 2) {
-                    file = document.getElementById("onhold2");
-                    if(file.value){
-                        jprms += '"onholdfile":"'+file.files[0].name+'",';
-                        upload('onhold2');
+        if(kind == 'selector') {
+            var modes = d.querySelectorAll('.init-mode');
+            for(i=0;i<modes.length;i++){
+                if(modes[i].checked) {
+                    jprms += '"initmode":'+modes[i].value+',';
+                    if(modes[i].value == 2) {
+                        file = document.getElementById("onhold2");
+                        if(file.value){
+                            jprms += '"onholdfile":"'+file.files[0].name+'",';
+                            upload('onhold2');
+                        }
                     }
                 }
             }
         }
     }
-    jprms += '}';
+    jprms += '}}';
+
+    console.log(jprms);
     json_rpc_async('setObject', jprms, handler); 
 }
+
+function addMembersRow(data){
+    console.log('addMembersRow');
+    console.log(data);
+
+    var row, cell, a;
+    row = document.createElement('tr');
+    row.id = data.number;
+    if(data.oid) row.setAttribute('data-oid', data.oid);
+    cell = row.insertCell(0);
+    // if(item.oid) {
+    //     a = document.createElement('a');
+    //     a.href = '#';
+    //     addEvent(a, 'click', get_extension);
+    //     cell.appendChild(a);
+    // } else {
+    cell.textContent = data.number;
+    // }
+
+    cell = row.insertCell(1);
+    cell.textContent = data.name || "";
+
+    cell = row.insertCell(2);
+    cell.textContent = data.display || "";
+
+    cell = row.insertCell(3);
+    cell.textContent = data.followme || "";
+
+    cell = row.insertCell(4);
+    button = document.createElement('button');
+    button.className = 'btn btn-danger btn-sm';
+    button.innerHTML = '<i class="glyphicon glyphicon-trash"></i>';
+    addEvent(button, 'click', delete_extension);
+    cell.appendChild(button);
+
+    return row;
+}
+
+// function delete_from_group(e){
+//     var this = e.target;
+//     var row = getClosest(this, 'tr'),
+//         ext = row.id,
+//         option = document.createElement('option');
+//         add = document.getElementById('add-user');
+//         available = document.getElementById('available-users');
+    
+//     row.parentNode.removeChild(row);
+//     option.value = ext;
+//     option.text = ext;
+//     available.add(option);
+//     sortSelect(available);
+
+//     if(add.hasAttribute('disabled')) {
+//         add.removeAttribute('disabled');    
+//     }
+// }
 
 function fill_list_items(listid, items){
     if(listid == 'available' || (ProjectML.kind != 'hunting')) {
@@ -240,6 +417,101 @@ function move_list_item(){
         parent.removeChild(li);
         document.getElementById('available').appendChild(li);
     }
+}
+
+function changeGroupType(grouptype){
+    console.log(grouptype);
+    var elements = [].slice.call(document.querySelectorAll('.object-type'));
+    elements.forEach(function(el){
+        if(el.classList.contains(grouptype)) {
+            el.classList.remove('hidden');
+        } else {
+            el.classList.add('hidden');
+        }
+    });
+}
+
+function addUser(type){
+    var e = e || window.event;
+    var table = document.getElementById('group-extensions').querySelector('tbody'),
+        available = document.getElementById('available-users'),
+        ext = available.options[available.selectedIndex].value,
+        name = document.getElementById('user-name'),
+        alias = document.getElementById('user-alias'),
+        followme = document.getElementById('user-num'),
+        login = document.getElementById('user-login'),
+        pass = document.getElementById('user-pass');
+
+    // if(!available.options.length) return;
+
+    var data = {
+        kind: 'user',
+        groupid: ProjectML.oid,
+        number: ext,
+        name: name.value,
+        display: alias.value
+    };
+    if(type == 'global') {
+        data.followme = followme.value;
+    } else if(type == 'local') {
+        data.localgin = login.value;
+        data.password = pass.value;
+    }
+    var stringdata = JSON.stringify(data);
+    var result = json_rpc('setObject', stringdata);
+
+    if(result) {
+        data.oid = result;
+        var newrow = addMembersRow(data);
+        var rows = table.rows;
+        if(!rows.length || ext > rows[rows.length-1].id) {
+            table.appendChild(newrow);
+        } else {
+            console.log(rows);
+            for(var i=0, nextrow = 0; i<rows.length-1; i++){
+                if(rows[i].id > ext) {
+                    nextrow = rows[i].id;
+
+                    // nextrow > rows[i].id ? nextrow : rows[i].id;
+                } 
+            }
+            console.log(nextrow);
+            table.insertBefore(newrow, document.getElementById(nextrow));
+        }
+        // table.appendChild(newrow);
+        ProjectML.members.push(data);
+            
+        var options = [].slice.call(available.options);
+        for(var i=0; i<available.options.length; i++) {
+            if(available.options[i].value === ext) {
+                available.removeChild(available.options[i]);
+            }
+        }
+        if(!available.options.length) {
+            var add = document.getElementById('add-user');
+            add.setAttribute('disabled', 'disabled');
+        }
+    }
+}
+
+function cleanForm(cleanform){
+    var name = document.getElementById('user-name').value = "",
+        alias = document.getElementById('user-alias').value = "",
+        followme = document.getElementById('user-num').value ="",
+        login = document.getElementById('user-login').value = "",
+        pass = document.getElementById('user-pass').value = "";
+}
+
+function newInput(data){
+    var div = document.createElement('div');
+        div.className = 'form-group';
+    if(data.label) {
+        var label = '<label for="'+data.id+'">'+data.label+'</label>';
+        div.innerHTML += label;
+    }
+    var input = '<input type="'+(data.type || 'text')+'" class="form-control" id="'+(data.id || '')+'" value="'+(data.value || '')+'">';
+    div.innerHTML += input;
+    return div;
 }
 
 /* 
@@ -281,10 +553,13 @@ function getInfoFromState(state, group){
 function createExtRow(data){
 
     var row = document.createElement('tr'),
+        info = getInfoFromState(data.state, data.group),
+        status = info.rstatus,
+        classname = info.rclass,
         cell, a, newkind;
 
     cell = row.insertCell(0);
-    if(data.oid){
+    if(data.oid && data.kind){
         a = document.createElement('a');
         if(data.kind == 'user' || data.kind == 'phone') {
             a.href = '#';
@@ -311,16 +586,18 @@ function createExtRow(data){
     cell.textContent = data.kind || "";
 
     cell = row.insertCell(5);
-    cell.textContent = data.status || "";
+    cell.textContent = status || "";
 
     cell = row.insertCell(6);
-    if(data.kind == 'user' || data.kind == 'phone') {
-        button = document.createElement('button');
-        button.className = 'btn btn-primary btn-sm';
-        button.innerHTML = '<i class="glyphicon glyphicon-edit"></i>';
-        addEvent(button, 'click', editExtension);
-        cell.appendChild(button);
-    }    
+    if(data.kind) {
+        if(data.kind == 'user' || data.kind == 'phone') {
+            button = document.createElement('button');
+            button.className = 'btn btn-primary btn-sm';
+            button.innerHTML = '<i class="glyphicon glyphicon-edit"></i>';
+            addEvent(button, 'click', editExtension);
+            cell.appendChild(button);
+        }    
+    }
     cell = row.insertCell(7);
     if(data.oid) {
         button = document.createElement('button');
@@ -330,40 +607,46 @@ function createExtRow(data){
         cell.appendChild(button);
     }
 
+    row.id = data.ext;
+    row.setAttribute('data-oid', data.oid);
+    row.className = classname;
+
     return row;
 
 }
 
 function load_extensions(result) {
     console.log(result);
-    var row, obj, state, info,
+    var row,
         table = document.getElementById('extensions').getElementsByTagName('tbody')[0],
         fragment = document.createDocumentFragment();
 
-    ProjectML.extensions = result;
+    // ProjectML.extensions = result;
 
     for(var i=0; i<result.length; i++){
 
-        obj = result[i];
-        state = obj.state;
-        info = getInfoFromState(state, obj.group);
+        if(!result[i].oid) continue;
 
-        data = {
-            oid: obj.oid,
-            ext: obj.ext,
-            kind: obj.kind,
-            group: obj.group,
-            status: info.rstatus,
-            name: obj.name,
-            reg: obj.reg
-        };
+        // obj = result[i];
+        // state = obj.state;
+        // info = getInfoFromState(state, obj.group);
+
+        // data = {
+        //     oid: obj.oid,
+        //     ext: obj.ext,
+        //     kind: obj.kind,
+        //     group: obj.group,
+        //     status: info.rstatus,
+        //     name: obj.name,
+        //     reg: obj.reg
+        // };
 
         // lrow = table.rows.length;
         // row = table.insertRow(lrow);
-        row = createExtRow(data);
-        row.id = obj.ext;
-        row.setAttribute('data-oid', obj.oid);
-        row.className = info.rclass;
+        row = createExtRow(result[i]);
+        // row.id = obj.ext;
+        // row.setAttribute('data-oid', obj.oid);
+        // row.className = info.rclass;
 
         fragment.appendChild(row);
 
@@ -391,44 +674,53 @@ function updateExtension(data){
     console.log(data);
 
     var row = document.getElementById(data.ext);
-    if(!row) return;
+    var state = data.state;
+    var info = getInfoFromState(state, data.group);
+
+    // if(!row) return;
     
-    var state = data.state,
-        cells = row.cells,
-        info = getInfoFromState(state, data.group),
-        status = info.rstatus,
-        className = info.rclass;
-    
-    row.className = className;
+    if(ProjectML.kind === 'extensions') {
+        var table = document.getElementById('extensions').querySelector('tbody');
+        if(row) {
+            var cells = row.cells,
+                status = info.rstatus,
+                className = info.rclass;
+            
+            row.className = className;
 
-    if(data.name){
-        cells[1].innerHTML = data.name;
-    }
-    if(data.hasOwnProperty('group')){
-        cells[2].innerHTML = data.group;
-    }
-    // else{
-    //     cells[2].innerHTML = "";   
-    // }
-    if(data.hasOwnProperty('reg')){
-        cells[3].innerHTML = data.reg;
-    }
-    // else{
-    //     cells[3].innerHTML = "";
-    // }
-    cells[5].innerHTML = status;
-
-    for(var ext in ProjectML.extensions){
-
-        if(ProjectML.extensions[ext].oid === data.oid || ProjectML.extensions[ext].ext === data.ext){
-            var ext = ProjectML.extensions[ext];
-            if(ext.state) ext.state = data.state;
-            if(ext.name) ext.name = data.name;
-            if(ext.group) ext.group = data.group;
-            if(ext.reg) ext.reg = data.reg;
+            if(data.name){
+                cells[1].innerHTML = data.name;
+            }
+            if(data.hasOwnProperty('group')){
+                cells[2].innerHTML = data.group;
+            }
+            // else{
+            //     cells[2].innerHTML = "";   
+            // }
+            if(data.hasOwnProperty('reg')){
+                cells[3].innerHTML = data.reg;
+            }
+            // else{
+            //     cells[3].innerHTML = "";
+            // }
+            cells[5].innerHTML = status;
+        } else {
+            row = createExtRow(data);
+            table.appendChild(row);
         }
-
     }
+
+    // for(var ext in ProjectML.extensions){
+
+    //     if(ProjectML.extensions[ext].oid === data.oid || ProjectML.extensions[ext].ext === data.ext){
+    //         var ext = ProjectML.extensions[ext];
+    //         if(ext.state) ext.state = data.state;
+    //         if(ext.name) ext.name = data.name;
+    //         if(ext.group) ext.group = data.group;
+    //         if(ext.reg) ext.reg = data.reg;
+    //     }
+
+    // }
 
 }
 
@@ -441,7 +733,7 @@ function get_extension(e){
     
     if(oid){
         show_loading_panel();
-        json_rpc_async('getObject', '\"oid\":\"'+oid+'\"', load_extension);
+        json_rpc_async('getObject', '{\"oid\":\"'+oid+'\"}', load_extension);
     }
     
 }
@@ -547,10 +839,13 @@ function set_extension_update(e){
         groupid = groups.options[groups.selectedIndex].value,
         reg = row.querySelector('.extreg');
 
-    var fwd, dnd, jprms = '\"oid\":\"'+toid+'\",';
+    var fwd, dnd, 
+    jprms = '{';
+    jprms += '\"oid\":\"'+toid+'\",';
     jprms += '\"name\":\"'+name+'\",';
     jprms += '\"groupid\":\"'+groupid+'\",';
     if(reg) jprms += '\"followme\":\"'+reg.value+'\",';
+    jprms += '}';
     json_rpc('setObject', jprms); 
 
     console.log(jprms);
@@ -595,95 +890,95 @@ function load_extension(result){
         d.getElementById('extpassword').type = 'text';
     }
     d.getElementById('extname').value = result.name;
-    d.getElementById('extpin').value = result.pin;
+    // d.getElementById('extpin').value = result.pin;
     d.getElementById('extlogin').value = result.login;
     d.getElementById('extpassword').value = result.password;
     d.getElementById('extdisplay').value = result.display;
-    if(result.features){
-        d.getElementById('extfeatures').style.display = '';
-        if(result.features.fwdall != undefined){
-            d.getElementById('forwarding').style.display = '';
-            d.getElementById('fwdall').checked = result.features.fwdall;
-            d.getElementById('fwdallnumber').value = result.features.fwdallnumber;
-            d.getElementById('fwdnreg').checked = result.features.fwdnreg;
-            d.getElementById('fwdnregnumber').value = result.features.fwdnregnumber;
-            d.getElementById('fwdbusy').checked = result.features.fwdbusy;
-            d.getElementById('fwdbusynumber').value = result.features.fwdbusynumber;
-            d.getElementById('fwdnans').checked = result.features.fwdnans;
-            d.getElementById('fwdnansnumber').value = result.features.fwdnansnumber;
-            d.getElementById('fwdtimeout').value = result.features.fwdtimeout;
-        }
-        else{
-            d.getElementById('forwarding').style.display = 'none';
-        }
+    // if(result.features){
+    //     d.getElementById('extfeatures').style.display = '';
+    //     if(result.features.fwdall != undefined){
+    //         d.getElementById('forwarding').style.display = '';
+    //         d.getElementById('fwdall').checked = result.features.fwdall;
+    //         d.getElementById('fwdallnumber').value = result.features.fwdallnumber;
+    //         d.getElementById('fwdnreg').checked = result.features.fwdnreg;
+    //         d.getElementById('fwdnregnumber').value = result.features.fwdnregnumber;
+    //         d.getElementById('fwdbusy').checked = result.features.fwdbusy;
+    //         d.getElementById('fwdbusynumber').value = result.features.fwdbusynumber;
+    //         d.getElementById('fwdnans').checked = result.features.fwdnans;
+    //         d.getElementById('fwdnansnumber').value = result.features.fwdnansnumber;
+    //         d.getElementById('fwdtimeout').value = result.features.fwdtimeout;
+    //     }
+    //     else{
+    //         d.getElementById('forwarding').style.display = 'none';
+    //     }
         
-        if(result.features.dnd != undefined){
-            d.getElementById('dnd').checked = result.features.dnd;
-        }
-        else{
-            d.getElementById('dnd').setAttribute('disabled','');
-            d.getElementById('dnd').checked = false;
-        }
-        if(result.features.clir != undefined){
-            d.getElementById('clir').checked = result.features.clir; 
-        }
-        else{
-            d.getElementById('clir').setAttribute('disabled','');
-            d.getElementById('clir').checked = false; 
-        }
-        if(result.features.callwaiting != undefined){
-            d.getElementById('callwaiting').checked = result.features.callwaiting;
-        }
-        else{
-            d.getElementById('callwaiting').setAttribute('disabled','');
-            d.getElementById('callwaiting').checked = false;
-        }
-        if(result.features.pickupdeny != undefined){
-            d.getElementById('pickupdeny').checked = result.features.pickupdeny;
-        }
-        else{
-            d.getElementById('pickupdeny').setAttribute('disabled','');
-            d.getElementById('pickupdeny').checked = false;
-        }
-        if(result.features.monitordeny != undefined){
-            d.getElementById('monitordeny').checked = result.features.monitordeny;
-        }
-        else{
-            d.getElementById('monitordeny').setAttribute('disabled','');
-            d.getElementById('monitordeny').checked = false;
-        }
-        if(result.features.busyoverdeny != undefined){
-            d.getElementById('busyoverdeny').checked = result.features.busyoverdeny;
-        }
-        else{
-            d.getElementById('busyoverdeny').setAttribute('disabled','');
-            d.getElementById('busyoverdeny').checked = false;
-        }
-        if(result.features.voicemail != undefined){
-            d.getElementById('voicemail').checked = result.features.voicemail;
-        }
-        else{
-            d.getElementById('voicemail').setAttribute('disabled','');
-            d.getElementById('voicemail').checked = false;
-        }
-        if(result.features.recording != undefined){
-            d.getElementById('recording').checked = result.features.recording;
-        }
-        else{
-            d.getElementById('recording').setAttribute('disabled','');
-            d.getElementById('recording').checked = false;
-        }
-        if(result.features.lock != undefined){
-            d.getElementById('plock').checked = result.features.lock;
-        }
-        else{
-            d.getElementById('plock').setAttribute('disabled','');
-            d.getElementById('plock').checked = false;
-        }
-    }
-    else {
-        d.getElementById('extfeatures').style.display = 'none';
-    }
+    //     if(result.features.dnd != undefined){
+    //         d.getElementById('dnd').checked = result.features.dnd;
+    //     }
+    //     else{
+    //         d.getElementById('dnd').setAttribute('disabled','');
+    //         d.getElementById('dnd').checked = false;
+    //     }
+    //     if(result.features.clir != undefined){
+    //         d.getElementById('clir').checked = result.features.clir; 
+    //     }
+    //     else{
+    //         d.getElementById('clir').setAttribute('disabled','');
+    //         d.getElementById('clir').checked = false; 
+    //     }
+    //     if(result.features.callwaiting != undefined){
+    //         d.getElementById('callwaiting').checked = result.features.callwaiting;
+    //     }
+    //     else{
+    //         d.getElementById('callwaiting').setAttribute('disabled','');
+    //         d.getElementById('callwaiting').checked = false;
+    //     }
+    //     if(result.features.pickupdeny != undefined){
+    //         d.getElementById('pickupdeny').checked = result.features.pickupdeny;
+    //     }
+    //     else{
+    //         d.getElementById('pickupdeny').setAttribute('disabled','');
+    //         d.getElementById('pickupdeny').checked = false;
+    //     }
+    //     if(result.features.monitordeny != undefined){
+    //         d.getElementById('monitordeny').checked = result.features.monitordeny;
+    //     }
+    //     else{
+    //         d.getElementById('monitordeny').setAttribute('disabled','');
+    //         d.getElementById('monitordeny').checked = false;
+    //     }
+    //     if(result.features.busyoverdeny != undefined){
+    //         d.getElementById('busyoverdeny').checked = result.features.busyoverdeny;
+    //     }
+    //     else{
+    //         d.getElementById('busyoverdeny').setAttribute('disabled','');
+    //         d.getElementById('busyoverdeny').checked = false;
+    //     }
+    //     if(result.features.voicemail != undefined){
+    //         d.getElementById('voicemail').checked = result.features.voicemail;
+    //     }
+    //     else{
+    //         d.getElementById('voicemail').setAttribute('disabled','');
+    //         d.getElementById('voicemail').checked = false;
+    //     }
+    //     if(result.features.recording != undefined){
+    //         d.getElementById('recording').checked = result.features.recording;
+    //     }
+    //     else{
+    //         d.getElementById('recording').setAttribute('disabled','');
+    //         d.getElementById('recording').checked = false;
+    //     }
+    //     if(result.features.lock != undefined){
+    //         d.getElementById('plock').checked = result.features.lock;
+    //     }
+    //     else{
+    //         d.getElementById('plock').setAttribute('disabled','');
+    //         d.getElementById('plock').checked = false;
+    //     }
+    // }
+    // else {
+    //     d.getElementById('extfeatures').style.display = 'none';
+    // }
     
     $('#el-extension').modal();
     show_content();
@@ -704,7 +999,8 @@ function set_extension(e){
         oid = ProjectML.oid,
         kind = ProjectML.kind;
     
-    var jprms = '\"oid\":\"'+oid+'\",';
+    var jprms = '{';
+    jprms += '\"oid\":\"'+oid+'\",';
     var group = d.getElementById("extgroup");
     if(group.options.length) var groupv = group.options[group.selectedIndex].value;
     
@@ -717,46 +1013,47 @@ function set_extension(e){
     jprms += '\"display\":\"'+d.getElementById("extdisplay").value+'\",';
     jprms += '\"login\":\"'+d.getElementById("extlogin").value+'\",';
     jprms += '\"password\":\"'+d.getElementById("extpassword").value+'\",';
-    jprms += '\"pin\":\"'+d.getElementById("extpin").value+'\",';
-    jprms += '\"features\":{';
-    if(d.getElementById("fwdall") != null){
-        jprms += '\"fwdall\":'+d.getElementById("fwdall").checked+',';
-        jprms += '\"fwdallnumber\":\"'+d.getElementById("fwdallnumber").value+'\",';
-    }
-    if(d.getElementById("fwdnregnumber") != null){   
-        jprms += '\"fwdnreg\":'+d.getElementById("fwdnreg").checked+',';
-        jprms += '\"fwdnregnumber\":\"'+d.getElementById("fwdnregnumber").value+'\",';
-    }
-    if(d.getElementById("fwdbusynumber") != null){
-        jprms += '\"fwdbusy\":'+d.getElementById("fwdbusy").checked+',';
-        jprms += '\"fwdbusynumber\":\"'+d.getElementById("fwdbusynumber").value+'\",';
-    }
-    if(d.getElementById("fwdnansnumber") != null){
-        jprms += '\"fwdnans\":'+d.getElementById("fwdnans").checked+',';
-        jprms += '\"fwdnansnumber\":\"'+d.getElementById("fwdnansnumber").value+'\",';
-    }  
-    if(d.getElementById("fwdtimeout") != null)    
-        jprms += '\"fwdtimeout\":'+d.getElementById("fwdtimeout").value+',';
-    if(d.getElementById("plock").disabled == false)    
-        jprms += '\"lock\":'+d.getElementById("plock").checked+',';
-    if(d.getElementById("dnd").disabled == false)    
-        jprms += '\"dnd\":'+d.getElementById("dnd").checked+',';
-    if(d.getElementById("clir").disabled == false)    
-        jprms += '\"clir\":'+d.getElementById("clir").checked+',';
-    if(d.getElementById("callwaiting").disabled == false)
-        jprms += '\"callwaiting\":'+d.getElementById("callwaiting").checked+',';
-    if(d.getElementById("pickupdeny").disabled == false)    
-        jprms += '\"pickupdeny\":'+d.getElementById("pickupdeny").checked+',';
-    if(d.getElementById("monitordeny").disabled == false)    
-        jprms += '\"monitordeny\":'+d.getElementById("monitordeny").checked+',';
-    if(d.getElementById("busyoverdeny").disabled == false)    
-        jprms += '\"busyoverdeny\":'+d.getElementById("busyoverdeny").checked+',';
-    if(d.getElementById("recording").disabled == false)    
-        jprms += '\"recording\":'+d.getElementById("recording").checked+',';
-    if(d.getElementById("voicemail").disabled == false)    
-        jprms += '\"voicemail\":'+d.getElementById("voicemail").checked+',';
-    jprms += '}';  
+    // jprms += '\"pin\":\"'+d.getElementById("extpin").value+'\",';
+    // jprms += '\"features\":{';
+    // if(d.getElementById("fwdall") != null){
+    //     jprms += '\"fwdall\":'+d.getElementById("fwdall").checked+',';
+    //     jprms += '\"fwdallnumber\":\"'+d.getElementById("fwdallnumber").value+'\",';
+    // }
+    // if(d.getElementById("fwdnregnumber") != null){   
+    //     jprms += '\"fwdnreg\":'+d.getElementById("fwdnreg").checked+',';
+    //     jprms += '\"fwdnregnumber\":\"'+d.getElementById("fwdnregnumber").value+'\",';
+    // }
+    // if(d.getElementById("fwdbusynumber") != null){
+    //     jprms += '\"fwdbusy\":'+d.getElementById("fwdbusy").checked+',';
+    //     jprms += '\"fwdbusynumber\":\"'+d.getElementById("fwdbusynumber").value+'\",';
+    // }
+    // if(d.getElementById("fwdnansnumber") != null){
+    //     jprms += '\"fwdnans\":'+d.getElementById("fwdnans").checked+',';
+    //     jprms += '\"fwdnansnumber\":\"'+d.getElementById("fwdnansnumber").value+'\",';
+    // }  
+    // if(d.getElementById("fwdtimeout") != null)    
+    //     jprms += '\"fwdtimeout\":'+d.getElementById("fwdtimeout").value+',';
+    // if(d.getElementById("plock").disabled == false)    
+    //     jprms += '\"lock\":'+d.getElementById("plock").checked+',';
+    // if(d.getElementById("dnd").disabled == false)    
+    //     jprms += '\"dnd\":'+d.getElementById("dnd").checked+',';
+    // if(d.getElementById("clir").disabled == false)    
+    //     jprms += '\"clir\":'+d.getElementById("clir").checked+',';
+    // if(d.getElementById("callwaiting").disabled == false)
+    //     jprms += '\"callwaiting\":'+d.getElementById("callwaiting").checked+',';
+    // if(d.getElementById("pickupdeny").disabled == false)    
+    //     jprms += '\"pickupdeny\":'+d.getElementById("pickupdeny").checked+',';
+    // if(d.getElementById("monitordeny").disabled == false)    
+    //     jprms += '\"monitordeny\":'+d.getElementById("monitordeny").checked+',';
+    // if(d.getElementById("busyoverdeny").disabled == false)    
+    //     jprms += '\"busyoverdeny\":'+d.getElementById("busyoverdeny").checked+',';
+    // if(d.getElementById("recording").disabled == false)    
+    //     jprms += '\"recording\":'+d.getElementById("recording").checked+',';
+    // if(d.getElementById("voicemail").disabled == false)    
+    //     jprms += '\"voicemail\":'+d.getElementById("voicemail").checked+',';
+    // jprms += '}';
 
+    jprms += '}';
     json_rpc('setObject', jprms); 
     
     $('#el-extension').modal('hide');
@@ -765,7 +1062,7 @@ function set_extension(e){
 }
 
 function fill_group_choice(kind, groupid, select){ 
-    var result = json_rpc('getObjects', '\"kind\":\"'+kind+'\"');
+    var result = json_rpc('getObjects', '{\"kind\":\"'+kind+'\"}');
     var gid, name, option, i;
     var select = select || document.getElementById("extgroup");
 
@@ -791,51 +1088,21 @@ function load_routes(result){
     
     ProjectML.oid = result.oid;
     ProjectML.kind = 'routes';
-    ProjectML.routepriorities = [
-        "Max. prefix length",
-        "Least cost routing",
-        "Load balancing",
-        "Answer seizure ratio",
-        "Average call duration",
-        "Most idle gateway",
-        "Least utilised gateway",
-        "Max. priority (status)"    
-    ];
+    
     ProjectML.name = result.name;
     if(result.name) {
         document.getElementById('objname').value = result.name;
     }
     
-    document.getElementById('enabled').checked = result.enabled;
-    
-    var i, 
-        ul = document.getElementById('priorities'),
-        priorities = result.priorities;
-    for(i=0; i<priorities.length; i++){
-        var li = document.createElement('li');
-        li.setAttribute('data-value', priorities[i]);
-        li.innerHTML = ProjectML.routepriorities[priorities[i]];
-        ul.appendChild(li);
-    }
-
-    var transforms = result.anumbertransforms;
-    if(transforms.length) {
-        for(i=0; i<transforms.length; i++){
-            append_transform(null, 'transforms1', transforms[i]);
+    var enabled = document.getElementById('enabled');
+    if(enabled) {
+        enabled.checked = result.enabled;
+        if(result.name) {
+            addEvent(enabled, 'change', function(){
+                console.log(result.oid+' '+this.checked);
+                json_rpc_async('setObjectState', '{\"oid\":\"'+result.oid+'\", \"enabled\":'+this.checked+'}', null); 
+            });
         }
-    }
-    else { 
-        append_transform(null, 'transforms1');
-    }
-
-    transforms = result.bnumbertransforms;
-    if(transforms.length){
-        for(i=0; i<transforms.length; i++){
-            append_transform(null, 'transforms2', transforms[i]);
-        }
-    }
-    else{
-        append_transform(null, 'transforms2');
     }
     
     if(result.routes != undefined){
@@ -844,14 +1111,16 @@ function load_routes(result){
     else{
         show_content();
     }
+    
     set_page();
 }
 
 function set_routes(){
         
     var name = document.getElementById('objname').value;
+    var jprms = '{';
     if(name)
-        var jprms = '\"name\":\"'+name+'\",';
+        jprms += '\"name\":\"'+name+'\",';
     else{
         alert('Object name must be filled');
         return false;
@@ -870,23 +1139,8 @@ function set_routes(){
     
     if(ProjectML.oid) jprms += '\"oid\":\"'+ProjectML.oid+'\",';
     jprms += '\"kind\":\"routes\",';
-    jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
+    // jprms += '\"enabled\":'+document.getElementById('enabled').checked+',';
  
-    jprms += '\"priorities\":[';
-    var ul = document.getElementById('priorities');
-    var i, j;
-    for(i=0; i<ul.children.length; i++){
-        jprms += ul.children[i].getAttribute('data-value')+',';
-    }
-    
-    jprms += '],';
-    jprms += '\"anumbertransforms\":[';
-    jprms += encode_transforms('transforms1');
-    jprms += '],';
-    jprms += '\"bnumbertransforms\":[';
-    jprms += encode_transforms('transforms2');
-    jprms += '],';
-    
     jprms += '\"routes\":[';
     var str, name, row, els, inp, table = document.getElementById('rtable'); 
     for(i=1; i<table.rows.length; i++){
@@ -911,39 +1165,41 @@ function set_routes(){
             else if(name == 'priority'){
                 str += '"priority":'+inp.value+',';
             }
-            else if(name == 'cost'){
-                str += '"cost":'+inp.value+',';
-            }
+            // else if(name == 'cost'){
+            //     str += '"cost":'+inp.value+',';
+            // }
         }
         if(str != '') jprms += '{'+str+'},';
     }
-    jprms += ']';
+    jprms += ']}';
     json_rpc_async('setObject', jprms, handler);     
 }
 
 function build_routes_table(routes){
-    var result = json_rpc('getObjects', '\"kind\":\"all\"');
-    console.log(result);
+    var result = json_rpc('getObjects', '{\"kind\":\"all\"}');
+    // console.log(result);
     var tbody = document.getElementById("rtable").getElementsByTagName('tbody')[0];
+    var fragment = document.createDocumentFragment();
     for(var i=0; i<routes.length; i++){
-        tbody.appendChild(build_route_row(routes[i], result));
+        fragment.appendChild(build_route_row(routes[i], result));
     }
-    tbody.appendChild(build_route_row(null, result));
+    tbody.appendChild(fragment);
+    if(!routes.length) tbody.appendChild(build_route_row(null, result));
     
     show_content();
 }
 
-function add_route(){
-    var result = json_rpc('getObjects', '\"kind\":\"all\"');
+function add_route(e){
+    var e = e || window.event;
+    if(e) e.preventDefault();
+
+    var result = json_rpc('getObjects', '{\"kind\":\"all\"}');
     var tbody = document.getElementById("rtable").getElementsByTagName('tbody')[0];
-    tbody.appendChild(build_route_row(null, result));
+    tbody.insertBefore(build_route_row(null, result), tbody.children[0]);
+    // tbody.appendChild(build_route_row(null, result));
 }
 
 function build_route_row(route, objects){
-
-    var e = e || window.event;
-    if(e.type == 'click')
-        e.preventDefault();
 
     var tr = document.createElement('tr');
     var td = document.createElement('td');
@@ -979,6 +1235,7 @@ function build_route_row(route, objects){
     var div = document.createElement('div');
     div.className = 'form-group';
     cell = document.createElement('select');
+    cell.className = 'form-control';
     cell.setAttribute('name', 'target');
     for(i=0; i<objects.length; i++){
         var kind = objects[i].kind;
@@ -1002,6 +1259,7 @@ function build_route_row(route, objects){
     var div = document.createElement('div');
     div.className = 'form-group';
     cell = document.createElement('select');
+    cell.className = 'form-control';
     cell.setAttribute('name', 'priority');
     for(i=0; i<10; i++){
         var option = document.createElement('option');
@@ -1022,18 +1280,18 @@ function build_route_row(route, objects){
     td.appendChild(div);
     tr.appendChild(td);
     
-    td = document.createElement('td');
-    var div = document.createElement('div');
-    div.className = 'form-group';
-    cell = document.createElement('input');
-    cell.className = 'form-control';
-    cell.setAttribute('type', 'text');
-    cell.setAttribute('name', 'cost');
-    cell.setAttribute('size', '4');
-    cell.setAttribute('value', route != null ? route.cost : '0');
-    div.appendChild(cell);
-    td.appendChild(div);
-    tr.appendChild(td);
+    // td = document.createElement('td');
+    // var div = document.createElement('div');
+    // div.className = 'form-group';
+    // cell = document.createElement('input');
+    // cell.className = 'form-control';
+    // cell.setAttribute('type', 'text');
+    // cell.setAttribute('name', 'cost');
+    // cell.setAttribute('size', '4');
+    // cell.setAttribute('value', route != null ? route.cost : '0');
+    // div.appendChild(cell);
+    // td.appendChild(div);
+    // tr.appendChild(td);
 
     if(route != null && route.huntstop != undefined){
         td = document.createElement('td');
@@ -1062,17 +1320,47 @@ function build_route_row(route, objects){
  */
 
 function load_trunk(result){
+    console.log(result);
     ProjectML.oid = result.oid;
     ProjectML.name = result.name;
     ProjectML.kind = 'trunk';
     
     if(result.name)
         document.getElementById('objname').value = result.name;
-    document.getElementById('enabled').checked = result.enabled;
+    
+    var enabled = document.getElementById('enabled');
+    if(enabled) {
+        enabled.checked = result.enabled;
+        if(result.name) {
+            addEvent(enabled, 'change', function(){
+                console.log(result.oid+' '+this.checked);
+                json_rpc_async('setObjectState', '{\"oid\":\"'+result.oid+'\", \"enabled\":'+this.checked+'}', null); 
+            });
+        }
+    }
+
     if(result.status)
-        document.getElementById('status').innerHTML = result.status;
-    if(result.protocol)
-        document.getElementById('protocol').value = result.protocol;
+        var el = document.getElementById('status');
+        if(el) el.innerHTML = result.status;
+    if(result.protocol) {
+        var option, protocols = document.getElementById('protocols');
+        if(result.name) {
+            option = document.createElement('option');
+            option.value = result.protocol;
+            option.textContent = result.protocol;
+            protocols.appendChild(option);
+        } else if(result.protocols) {
+            result.protocols.forEach(function(proto){
+                option = document.createElement('option');
+                option.value = proto;
+                option.textContent = proto;
+                protocols.appendChild(option);
+            });
+            addEvent(protocols, 'change', change_protocol);
+        }
+        change_protocol();
+            
+    }
     if(result.domain)
         document.getElementById('domain').value = result.domain;
     document.getElementById('register').checked = result.register;
@@ -1187,9 +1475,6 @@ function load_trunk(result){
     else{
         append_transform(null, 'transforms4');
     }
-    
-    var proto = document.getElementById('protocol');
-    proto.onchange = change_protocol;
 
     show_content();
     set_page();
@@ -1198,9 +1483,9 @@ function load_trunk(result){
 
 function set_trunk(){
     var name = document.getElementById('objname').value;
-    var jprms;
+    var jprms = '{';
     if(name)
-        jprms = '"name":"'+name+'",';
+        jprms += '"name":"'+name+'",';
     else{
         alert('Object name must be filled');
         return false;
@@ -1222,7 +1507,7 @@ function set_trunk(){
     jprms += '"kind":"trunk",';
     jprms += '"enabled":'+document.getElementById('enabled').checked+',';
 
-    var protocol = document.getElementById('protocol').value;
+    var protocol = document.getElementById('protocols').value;
     jprms += '"protocol":"'+protocol+'",';
     jprms += '"domain":"'+document.getElementById('domain').value+'",';
     jprms += '"register":'+document.getElementById('register').checked+',';
@@ -1279,29 +1564,29 @@ function set_trunk(){
         jprms += '"dtmfmode":"'+document.getElementById('dtmfsip').value+'",';
     }
     jprms += '},';
-    jprms += '"inboundbnumbertransforms":[';
+    jprms += '"inboundanumbertransforms":[';
     jprms += encode_transforms('transforms1');
     jprms += '],';
-    jprms += '"inboundanumbertransforms":[';
+    jprms += '"inboundbnumbertransforms":[';
     jprms += encode_transforms('transforms2');
     jprms += '],';
-    jprms += '"outboundbnumbertransforms":[';
+    jprms += '"outboundanumbertransforms":[';
     jprms += encode_transforms('transforms3');
     jprms += '],';
-    jprms += '"outboundanumbertransforms":[';
+    jprms += '"outboundbnumbertransforms":[';
     jprms += encode_transforms('transforms4');
-    jprms += ']';
+    jprms += ']}';
 
     json_rpc_async('setObject', jprms, handler); 
 };
 
 function change_protocol(){
-    var value = this.value;
+    var value = this.value || document.getElementById('protocols').value;
     if(value == 'h323') {
         document.getElementById('sip').parentNode.style.display = 'none';
         document.getElementById('h323').parentNode.style.display = '';
     }
-    else {
+    else if(value == 'sip') {
         document.getElementById('sip').parentNode.style.display = '';
         document.getElementById('h323').parentNode.style.display = 'none';
     }

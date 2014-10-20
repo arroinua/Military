@@ -1,31 +1,119 @@
 <div id="el-loaded-content">
-    <div class="col-xs-12 col-custom">
-        <div class="input-group object-name">
-            <input type=text id="objname" class="form-control" placeholder="Ім'я групи" autofocus>
-            <span class="input-group-addon">
-                <input type="checkbox" id="enabled"> Вкл.
-            </span>
+    <div class="row">
+        <div class="col-xs-12 col-custom">
+            <div class="input-group object-name">
+                <input type=text id="objname" class="form-control" placeholder="Ім'я групи" autofocus>
+                <span class="input-group-addon">
+                    <div class="switch">
+                        <input id="enabled" class="cmn-toggle cmn-toggle-round" type="checkbox">
+                        <label for="enabled"></label>
+                    </div>
+                </span>
+                <!-- <span class="input-group-addon">
+                    <input type="checkbox" id="enabled"> Вкл.
+                </span> -->
+            </div>
         </div>
     </div>
     <div class="row pl-kind pl-users">
-        <div class="col-sm-4 col-xs-12">
-            <a href=""></a>
-        </div>
-        <div class="col-sm-8 col-xs-12 col-custom">
+        <div class="col-md-4 col-sm-12 col-custom">
             <div class="panel">
+                <div class="custom panel-header"> Додати Користувача
+                    <i class="glyphicon glyphicon-plus"></i>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal" id="new-user-form">
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <div class="col-xs-6">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="userType" value="local"> Локальний
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-6">
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" name="userType" value="global"> Глобальний
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-xs-6">
+                            <div class="form-group">
+                                <label for="user-ext" class="col-xs-12">Номер</label>
+                                <div class="col-xs-12">
+                                    <select id="available-users" class="form-control"></select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user-name" class="col-xs-12">Ім'я</label>
+                                <div class="col-xs-12">
+                                    <input type="text" class="form-control" id="user-name">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user-dname" class="col-xs-12">Псевдонім</label>
+                                <div class="col-xs-12">
+                                    <input type="text" class="form-control" id="user-alias">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-xs-6">
+                            <div class="form-group object-type global">
+                                <label for="user-num" class="col-xs-12">Телефон</label>
+                                <div class="col-xs-12">
+                                    <input type="text" class="form-control" id="user-num">
+                                </div>
+                            </div>
+                            <div class="object-type local">
+                                <div class="form-group">
+                                    <label for="user-login" class="col-xs-12">Логін</label>
+                                    <div class="col-xs-12">
+                                        <input type="text" class="form-control" id="user-login">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="user-pass" class="col-xs-12">Пароль</label>
+                                    <div class="col-xs-12">
+                                        <input type="text" class="form-control" id="user-pass">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="col-xs-12">
+                            <div class="form-group">
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-primary btn-lg" id="add-user">Додати</button>
+                                </div>
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-default btn-lg" id="clear-input">Очистити</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8 col-sm-12 col-custom">
+            <div class="panel">
+                <div class="panel-header"> Користувачі
+                    <i class="glyphicon glyphicon-chevron-down"></i>
+                </div>
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table" id="extensions">
+                        <table class="table" id="group-extensions">
                             <thead>
                                 <tr>
-                                    <th>Тел.</th>
+                                    <th>Номер</th>
                                     <th>Ім'я</th>
                                     <th>Псевдонім</th>
-                                    <!-- <th>Реєстрація</th> -->
-                                    <!-- <th>Тип тел.</th> -->
-                                    <!-- <th>Статус</th> -->
+                                    <th>Телефон</th>
                                     <th style="width:5px"></th>
-                                    <th style="width:5px"></th>
+                                    <!-- <th style="width:5px"></th> -->
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -109,46 +197,51 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group pl-kind pl-conference pl-channel pl-selector">
+                        <hr>
+                        <!-- <div class="form-group pl-kind pl-conference pl-channel pl-selector">
                             <label for="in-number" class="col-sm-4">Внутрішній номер</label>
                             <div class="col-sm-4">
                                 <select id="in-number" class="form-control"></select>
                             </div>
-                        </div>
-                        <div class="form-group pl-kind pl-conference pl-channel">
+                        </div> -->
+                        <div class="form-group pl-kind pl-channel object-type global">
                             <label for="out-number" class="col-sm-4">Зовнішній номер</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control" id="out-number">
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="dialuptt" class="col-sm-4">Таймаут дозвону</label>
-                            <div class="col-sm-3">
-                                <input type="text" class="form-control" id="dialuptt">
+                        <div class="pl-kind pl-conference pl-selector">
+                            <div class="form-group">
+                                <label for="dialuptt" class="col-sm-4">Таймаут дозвону</label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control" id="dialuptt">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-4 col-sm-8">
+                                  <div class="checkbox">
+                                    <label>
+                                      <input type="checkbox" id="autoredial"> Перенабирати зайнятий номер
+                                    </label>
+                                  </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-4 col-sm-8">
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" id="autoredial"> Перенабирати зайнятий номер
-                                </label>
-                              </div>
+                        <div class="object-type local">
+                            <div class="form-group">
+                                <div class="col-sm-offset-4 col-sm-8">
+                                  <div class="checkbox">
+                                    <label>
+                                      <input type="checkbox" id="playgreet"> Програвати привітання
+                                    </label>
+                                  </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-4 col-sm-8">
-                              <div class="checkbox">
-                                <label>
-                                  <input type="checkbox" id="playgreet"> Програвати привітання
-                                </label>
-                              </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="greeting2" class="col-sm-4">Файл привітання:</label>
-                            <div class="col-sm-8">
-                                <input type="file" id="greeting2" class="upload-custom needsclick">
+                            <div class="form-group">
+                                <label for="greeting2" class="col-sm-4">Файл привітання:</label>
+                                <div class="col-sm-8">
+                                    <input type="file" id="greeting2" class="upload-custom needsclick">
+                                </div>
                             </div>
                         </div>
                         <hr>
@@ -292,7 +385,7 @@
                                     <th>Стріп</th>
                                     <th>Префікс</th>
                                     <th>
-                                        <a href="" class="add-clr transrow">
+                                        <a href="#" class="add-clr transrow">
                                             <i class="glyphicon glyphicon-plus"></i>
                                         </a>
                                     </th>
@@ -307,7 +400,7 @@
             </div>
         </div>
     </div>
-    <div class="row">
+    <div class="row pl-kind pl-all">
         <div class="col-xs-12">
             <div class="panel">
                 <div class="panel-body">

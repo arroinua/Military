@@ -1,11 +1,17 @@
 <div id="el-loaded-content">
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-xs-12 col-custom">
             <div class="input-group object-name">
                 <input type=text id="objname" class="form-control" placeholder="Ім'я транка" autofocus>
                 <span class="input-group-addon">
-                    <input type="checkbox" id="enabled"> <span id="status" class="label label-default"> </span>
+                    <div class="switch">
+                        <input id="enabled" class="cmn-toggle cmn-toggle-round" type="checkbox">
+                        <label for="enabled"></label>
+                    </div>
                 </span>
+                <!-- <span class="input-group-addon">
+                    <input type="checkbox" id="enabled">
+                </span> -->
             </div>
         </div>
     </div>
@@ -20,10 +26,10 @@
                         <div class="form-group">
                             <label for="huntmode1" class="col-md-5 control-label">Протокол</label>
                             <div class="col-md-2">
-                                <select id="protocol" class="form-control">
-                                    <option value="sip">sip</option>
+                                <select id="protocols" class="form-control">
+                                    <!-- <option value="sip">sip</option>
                                     <option value="sips">sips</option>
-                                    <option value="h323">h323</option>
+                                    <option value="h323">h323</option> -->
                                 </select>
                             </div>
                         </div>
@@ -132,7 +138,7 @@
                                     <th>Стріп</th>
                                     <th>Префікс</th>
                                     <th>
-                                        <a href="" class="add-clr transrow">
+                                        <a href="#" class="add-clr transrow">
                                             <i class="glyphicon glyphicon-plus"></i>
                                         </a>
                                     </th>
@@ -151,7 +157,7 @@
                                     <th>Стріп</th>
                                     <th>Префікс</th>
                                     <th>
-                                        <a href="" class="add-clr transrow">
+                                        <a href="#" class="add-clr transrow">
                                             <i class="glyphicon glyphicon-plus"></i>
                                         </a>
                                     </th>
@@ -196,7 +202,7 @@
                                     <th>Стріп</th>
                                     <th>Префікс</th>
                                     <th>
-                                        <a href="" class="add-clr transrow">
+                                        <a href="#" class="add-clr transrow">
                                             <i class="glyphicon glyphicon-plus"></i>
                                         </a>
                                     </th>
@@ -217,7 +223,7 @@
                                     <th>Стріп</th>
                                     <th>Префікс</th>
                                     <th>
-                                        <a href="" class="add-clr transrow">
+                                        <a href="#" class="add-clr transrow">
                                             <i class="glyphicon glyphicon-plus"></i>
                                         </a>
                                     </th>

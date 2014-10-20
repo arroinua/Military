@@ -56,7 +56,8 @@ function json_rpc(method, params){
         jsonrpc = '{\"method\":\"'+method+'\", \"id\":'+1+'}';
     }
     else{
-        jsonrpc = '{\"method\":\"'+method+'\", \"params\":{'+params+'}, \"id\":'+1+'}';
+        jsonrpc = '{\"method\":\"'+method+'\", \"params\":'+params+', \"id\":'+1+'}';
+        // jsonrpc = '{\"method\":\"'+method+'\", \"params\":{'+params+'}, \"id\":'+1+'}';
     }
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.open("POST", "/", false);
@@ -64,9 +65,8 @@ function json_rpc(method, params){
     xmlhttp.send(jsonrpc);
     var parsedJSON = JSON.parse(xmlhttp.responseText);
     if(parsedJSON.error != undefined){
-        if(parsedJSON.error.code == 404 || parsedJSON.error.code == 406) {
-            return;
-        }
+        notify_about('error' , parsedJSON.error.message);
+        return;
     }
     return parsedJSON.result;
 }
@@ -74,7 +74,7 @@ function json_rpc(method, params){
 function json_rpc_async(method, params, handler, id){
     var jsonrpc;
     if(params)
-        jsonrpc = '{\"method\":\"'+method+'\", \"params\":{'+params+'}, \"id\":'+1+'}';
+        jsonrpc = '{\"method\":\"'+method+'\", \"params\":'+params+', \"id\":'+1+'}';
     else
         jsonrpc = '{\"method\":\"'+method+'\", \"id\":'+1+'}';
 
@@ -141,6 +141,7 @@ function sendData(method, params, id){
 }
 
 function loadTranslations(result){
+    console.log(result);
     ProjectML.frases = result;
 }
 
@@ -198,23 +199,24 @@ function callbackOnId(id, result){
 
 }
 
-function init(result){
+function init(){
 
-    ProjectML.language = result.lang || 'uk';
+    // ProjectML.language = result.lang || 'uk';
+    ProjectML.language = 'uk';
 
     if (document.readyState === "complete" || document.readyState === "interactive") {
-        init_page(result);
+        init_page();
     } else {
         if (document.addEventListener) {
             document.addEventListener('DOMContentLoaded', function factorial() {
                 document.removeEventListener('DOMContentLoaded', arguments.callee, false);
-                init_page(result);
+                init_page();
             }, false);
         } else if (document.attachEvent) {
             document.attachEvent('onreadystatechange', function() {
                 if (document.readyState === 'complete') {
                     document.detachEvent('onreadystatechange', arguments.callee);
-                    init_page(result);
+                    init_page();
                 }
             });
         }
@@ -269,35 +271,47 @@ function showGroups(e){
     var parent = targ.parentNode;
     var groupslist = parent.querySelector('ul');
 
-    console.log(kind);
     if(!groupslist){
         var ul, li, a;
-        var result = json_rpc('getObjects', '\"kind\":\"'+kind+'\"');
-        ProjectML.groups[kind] = ProjectML.groups[kind] || [];
-        ProjectML.groups[kind].push(result);
+        json_rpc_async('getObjects', '{\"kind\":\"'+kind+'\"}', function(result){
+            console.log(result);
+            ProjectML.groups[kind] = [];
+            ProjectML.groups[kind].push(result);
 
-        ul = document.createElement('ul');
-        li = document.createElement('li');
-        a = document.createElement('a');
-
-        if(kind != 'routes') {
+            ul = document.createElement('ul');
             ul.id = 'ul-'+kind;
-            li.className = 'add-group-object';
-            a.href = '#'+kind;
-            a.innerHTML ='<i class="glyphicon glyphicon-plus"></i><span>'+ProjectML.frases.add[ProjectML.language]+'</span>';
 
-            li.appendChild(a);
-            ul.appendChild(li);    
-        }
+            likind = document.createElement('li');
+            likind.className = 'menu-name';
+            likind.innerHTML = ProjectML.frases.kinds[kind][ProjectML.language];
+            ul.appendChild(likind);
 
-        result.forEach(function(item, i){
             li = document.createElement('li');
-            li.innerHTML = '<a href="#'+kind+'?'+item.oid+'">'+item.name+'</a>';
-            ul.appendChild(li);
-        });
+            a = document.createElement('a');
+            
+            if(kind != 'routes') {
+                li.className = 'add-group-object';
+                a.href = '#'+kind;
+                a.innerHTML ='<i class="glyphicon glyphicon-plus"></i><span>'+ProjectML.frases.add[ProjectML.language]+'</span>';
 
-        parent.appendChild(ul);
-        parent.classList.toggle('active');
+                li.appendChild(a);
+                ul.appendChild(li);    
+            }
+
+            result.forEach(function(item, i){
+                li = document.createElement('li');
+                li.innerHTML = '<a href="#'+kind+'?'+item.oid+'">'+item.name+'</a>';
+                ul.appendChild(li);
+            });
+
+            parent.appendChild(ul);    
+
+            parent.classList.toggle('active');
+
+            show_content(false);
+        });
+    
+        show_loading_panel(parent);
     } else {
         parent.classList.toggle('active');
     }
@@ -306,8 +320,8 @@ function showGroups(e){
 function get_object(result){
 
     var query = location.hash.substring(1),
-        obj = query.indexOf('?') != -1 ? query.substring(0, query.indexOf('?')) : query.substring(0),
-        oid = query.indexOf('?') != -1 ? query.substring(query.indexOf('?')+1) : obj, //if no oid in query then set kind as oid
+        kind = query.indexOf('?') != -1 ? query.substring(0, query.indexOf('?')) : query.substring(0),
+        oid = query.indexOf('?') != -1 ? query.substring(query.indexOf('?')+1) : kind, //if no oid in query then set kind as oid
         lang = ProjectML.language,
         callback = null,
         fn = null;
@@ -316,7 +330,7 @@ function get_object(result){
     if(query != ''){
 
         ProjectML.query = query;
-        ProjectML.obj = obj;
+        ProjectML.kind = kind;
         ProjectML.oid = oid;
 
         $('#dcontainer').addClass('faded');
@@ -326,30 +340,31 @@ function get_object(result){
         var modal = document.getElementById('el-extension');
         if(modal) modal.parentNode.removeChild(modal);
 
-        if(obj == 'users' || obj == 'channel' || obj == 'hunting' || obj == 'conference' || obj == 'selector'){
-            obj = 'bgroup';
+        if(kind == 'users' || kind == 'channel' || kind == 'hunting' || kind == 'conference' || kind == 'selector'){
+            kind = 'bgroup';
         }
 
-        callback = 'load_' + obj;
+        callback = 'load_' + kind;
         fn = window[callback];
+
 //        var url = '/badmin/js/'+query+'.js';
 //        $.getScript(url, function(){
 
-            $("#dcontainer").load('badmin/'+lang+'/'+obj+'.html', function(){
-                if(obj == 'extensions'){
+            $("#dcontainer").load('/badmin/'+lang+'/'+kind+'.html', function(){
+                if(kind == 'extensions'){
                     // if(ProjectML.extensions)
                     //     load_extensions(ProjectML.extensions);
                     // else
                         json_rpc_async('getExtensions', null, fn);
                 }
-                // else if(obj == 'calls' || obj == 'records'){
+                // else if(kind == 'calls' || kind == 'records'){
                 //     fn();
                 // }
                 else {
-                    json_rpc_async('getObject', '\"oid\":\"'+oid+'\"', fn);
+                    json_rpc_async('getObject', '{\"oid\":\"'+oid+'\"}', fn);
                 }
                 $('#dcontainer').scrollTop(0);
-                $('.squeezed-menu > ul').children('li.active').removeClass('active').children('ul:visible').slideUp('normal');
+                // $('.squeezed-menu > ul').children('li.active').removeClass('active').children('ul:visible').slideUp('normal');
             });
 //        });
     }
@@ -364,6 +379,7 @@ function set_page(){
         rtrow = document.querySelectorAll('.routerow'),
         so = document.getElementById('el-set-object'),
         delobj = document.getElementById('el-delete-object'),
+        name = ProjectML.name, //name = object name or value of 'objname' input
         handler = 'set_'+kind,
         fn = window[handler];
 
@@ -383,16 +399,47 @@ function set_page(){
         };
     }
     if(delobj){
-        if(ProjectML.name){
+        if(name){
             delobj.onclick = function(e){
-                delete_object(e, ProjectML.name, ProjectML.kind, ProjectML.oid);
+                delete_object(e, name, ProjectML.kind, ProjectML.oid);
             };
         }
         else delobj.setAttribute('disabled', 'disabled');
     }
 
     $('div.panel-header').click(toggle_panel);
+}
 
+function setBreadcrumbs(){
+    console.log(ProjectML.kind);
+    var breadcrumb = document.querySelector('.breadcrumb');
+    while (breadcrumb.firstChild) {
+        breadcrumb.removeChild(breadcrumb.firstChild);
+    }
+    if(!ProjectML.kind) return;
+    var objname = document.getElementById('objname');
+    var crumbs = document.createDocumentFragment();
+    var bc1, bc2;
+    
+    bc1 = document.createElement('li');
+    if(ProjectML.kind == 'routes')
+        bc1.innerHTML = ProjectML.frases.kinds[ProjectML.kind][ProjectML.language];
+    else
+        bc1.innerHTML = '<a href="#'+ProjectML.kind+'">'+ProjectML.frases.kinds[ProjectML.kind][ProjectML.language]+'</a>';
+
+    bc2 = document.createElement('li');
+    bc2.className = 'active';
+
+    if(objname) {
+        bc2.innerHTML = objname.value;
+        addEvent(objname, 'input', function(){
+            bc2.innerHTML = objname.value;
+        });
+    }
+
+    crumbs.appendChild(bc1);
+    crumbs.appendChild(bc2);
+    breadcrumb.appendChild(crumbs);
 }
 
 function toggle_sidebar(e){    
@@ -451,7 +498,7 @@ function toggle_presentation() {
     });
 }
 
-function show_loading_panel(){
+function show_loading_panel(container){
     if(document.getElementById('el-loading')) return;
     var back = document.createElement('div');
     back.id = 'el-loading';
@@ -459,22 +506,53 @@ function show_loading_panel(){
     var load = document.createElement('img');
     load.src = '/badmin/images/sprites_white.png';
     load.className = 'loader';
-    var cont = document.getElementById('pagecontainer');
     back.appendChild(load);
+
+    var cont = container || document.getElementById('pagecontainer');
     cont.appendChild(back);    
 }
 
-function show_content(){
+function show_content(togglecont){
     var loading = document.getElementById('el-loading');
     if(loading) loading.parentNode.removeChild(loading);
+
+    if($('#dcontainer').hasClass('faded')) 
+        $('#dcontainer').removeClass('faded');
+
+    if(togglecont === false) return;
 
     if(isSmallScreen() && $('#pagecontent').hasClass('squeezed-right')) {
         $('#pagecontent').toggleClass('squeezed-right');
         $('#pbxmenu').toggleClass('squeezed-right');
     }
-    $('#dcontainer').removeClass('faded');
-
+    
+    setBreadcrumbs();
 }
+
+// function show_loading_panel(){
+//     if(document.getElementById('el-loading')) return;
+//     var back = document.createElement('div');
+//     back.id = 'el-loading';
+//     back.className = 'el-loading-panel ';
+//     var load = document.createElement('img');
+//     load.src = '/badmin/images/sprites_white.png';
+//     load.className = 'loader';
+//     var cont = document.getElementById('pagecontainer');
+//     back.appendChild(load);
+//     cont.appendChild(back);    
+// }
+
+// function show_content(){
+//     var loading = document.getElementById('el-loading');
+//     if(loading) loading.parentNode.removeChild(loading);
+
+//     if(isSmallScreen() && $('#pagecontent').hasClass('squeezed-right')) {
+//         $('#pagecontent').toggleClass('squeezed-right');
+//         $('#pbxmenu').toggleClass('squeezed-right');
+//     }
+//     $('#dcontainer').removeClass('faded');
+
+// }
 
 function switch_presentation(kind){
     var container = document.getElementById('dcontainer');
@@ -483,7 +561,11 @@ function switch_presentation(kind){
     var panels = [].slice.call(container.querySelectorAll('.pl-kind'));
     var action;
     panels.forEach(function(item){
-        action = item.classList.contains('pl-'+kind) ? 'add' : 'remove';
+        if(item.classList.contains('pl-'+kind) || item.classList.contains('pl-all')) {
+            action = 'add';
+        } else {
+            action = 'remove';
+        }
         item.classList[action]('revealed');
     });
 }
@@ -722,6 +804,7 @@ function addNewObject(data){
         name = data.name,
         enabled = data.enabled,
         load = document.getElementById('el-loading'),
+        delobj = document.getElementById('el-delete-object'),
         ul = document.getElementById('ul-'+data.kind);
 
     if(load) load.parentNode.removeChild(load);
@@ -735,6 +818,13 @@ function addNewObject(data){
         ul.appendChild(li);
     }
 
+    if(delobj && delobj.hasAttribute('disabled')) {
+        delobj.removeAttribute('disabled');
+        delobj.onclick = function(e){
+            delete_object(e, ProjectML.name, ProjectML.kind, ProjectML.oid);
+        };
+    }
+
     update = {
         enabled: enabled,
         name: name,
@@ -746,6 +836,7 @@ function addNewObject(data){
     ProjectML.groups[kind].push(update);
 
     notify_about('success', name+' '+ProjectML.frases.created[ProjectML.language]);
+    window.location.href = '#'+ProjectML.query;
 
 }
 
@@ -777,21 +868,28 @@ function delete_object(e, name, kind, oid){
     if (c){
         var ul = document.getElementById('ul-'+kind);
         if(ul){
-            var li, href;
+            var li, a, href;
             for(var i=0;i<ul.children.length;i++){
                 li = ul.children[i];
-                href = li.children[0].href;
-                if(href && href.substring(href.indexOf('?')+1) == oid){
-                    ul.removeChild(li);
+                a = li.querySelector('a');
+                if(a && a.href) {
+                    href = a.href;
+                    if(href && href.substring(href.indexOf('?')+1) == oid){
+                        ul.removeChild(li);
+                    }
+                } else {
+                    continue;
                 }
             }
         }
-        json_rpc('deleteObject', '\"oid\":\"'+oid+'\"');
+        json_rpc('deleteObject', '{\"oid\":\"'+oid+'\"}');
         if(oid === ProjectML.oid) window.location.hash = kind;
 
-        ProjectML.groups[kind] = ProjectML.groups[kind].filter(function(obj){
-            return obj.oid !== oid;
-        });
+        if(ProjectML.groups[kind]) {
+            ProjectML.groups[kind] = ProjectML.groups[kind].filter(function(obj){
+                return obj.oid !== oid;
+            });
+        }
     }
     else{
         return false;
@@ -800,23 +898,28 @@ function delete_object(e, name, kind, oid){
 
 function delete_extension(e){
     var row = getClosest(e.target, 'tr'),
-        table = row.parentNode;
+        oid = row.getAttribute('data-oid'),
+        table = row.parentNode,
         ext = row.id,
-        anchor = row.querySelector('a');
-        group = row.cells[2].textContent,
-        msg = ProjectML.frases.doDelete[ProjectML.language] + ' ' + ext + ' ' +ProjectML.frases.from[ProjectML.language] + ' ' + group + '?',
+        anchor = row.querySelector('a'),
+        group = ProjectML.kind === 'extensions' ? row.cells[2].textContent : ProjectML.name,
+        msg = ProjectML.frases.doDelete[ProjectML.language] + ' ' + ext + ' ' +ProjectML.frases.from[ProjectML.language] + ' ' + (group ? group : "") + '?',
         c = confirm(msg);
 
     if (c){
-        anchor.removeAttribute('href');
-        removeEvent(anchor, 'click', get_extension);
-        var oid = row.getAttribute('data-oid');
-        json_rpc_async('deleteObject', '\"oid\":\"'+oid+'\"', null);
+        json_rpc_async('deleteObject', '{\"oid\":\"'+oid+'\"}', function(){
+            console.log(table);
+            console.log(row);
+            if(anchor) {
+                anchor.removeAttribute('href');
+                removeEvent(anchor, 'click', get_extension);
+            }
+            table.removeChild(row);
+        });
         
-        newRow = createExtRow(ext);
-        newRow.className = 'active';
-        table.insertBefore(newRow, row);
-        table.removeChild(row);
+        // newRow = createExtRow(ext);
+        // newRow.className = 'active';
+        // table.insertBefore(newRow, row);
     }
     else{
         return false;
@@ -877,7 +980,7 @@ function upload(inputid){
 }
 
 function get_object_link(oid){
-    var result = json_rpc('getObject', '\"oid\":\"'+oid+'\"');   
+    var result = json_rpc('getObject', '{\"oid\":\"'+oid+'\"}');   
     location.hash = result.kind+'?'+oid;
 }
 
@@ -889,7 +992,7 @@ function get_object_link(oid){
 // }
 
 function isSmallScreen(){
-    return $(window).width() < 768;
+    return $(window).width() < 760;
 }
 
 function getClosest(elem, selector) {
@@ -920,6 +1023,43 @@ function getClosest(elem, selector) {
     return false;
 
 };
+
+
+function sortSelect(selectElement) {
+    var options = [].slice.call(selectElement.options);
+ 
+    options.sort(function(a,b) {
+        if (a.text.toUpperCase() > b.text.toUpperCase()) return 1;
+        else if (a.text.toUpperCase() < b.text.toUpperCase()) return -1;
+        else return 0;
+    });
+ 
+    $(selectElement).empty().append( options );
+}
+
+// function sortTable(tbody, col, asc){
+//     var rows = tbody.rows, 
+//     rlen = rows.length, 
+//     arr = new Array(), 
+//     i, j, cells, clen;
+//     // fill the array with values from the table
+//     for(i = 0; i < rlen; i++){
+//     cells = rows[i].cells;
+//     clen = cells.length;
+//     arr[i] = new Array();
+//         for(j = 0; j < clen; j++){
+//             arr[i][j] = cells[j].innerHTML;
+//         }
+//     }
+//     // sort the array by the specified column number (col) and order (asc)
+//     arr.sort(function(a, b){
+//         return (a[col] == b[col]) ? 0 : ((a[col] > b[col]) ? asc : -1*asc);
+//     });
+//     for(i = 0; i < rlen; i++){
+//         arr[i] = "<td>"+arr[i].join("</td><td>")+"</td>";
+//     }
+//     tbody.innerHTML = "<tr>"+arr.join("</tr><tr>")+"</tr>";
+// }
 
 function addEvent(obj, evType, fn) {
   if (obj.addEventListener) obj.addEventListener(evType, fn, false); 
@@ -1042,8 +1182,8 @@ function set_pbx_options(e) {
     else{
         show_loading_panel();
     }
-
-    jprms = '"lang":"' + lang + '",';
+    jprms = '{';
+    jprms += '"lang":"' + lang + '",';
     jprms += '"name":"' + name + '",';
     jprms += '"branchid":"' + document.getElementById('branchid').value + '",';
     jprms += '"oid":"' + ProjectML.oidOptions + '",';
@@ -1094,7 +1234,7 @@ function set_pbx_options(e) {
     jprms += '"outboundbnumbertransforms":[';
     jprms += encode_transforms('transforms8');
     jprms += ']';
-    jprms += '}';
+    jprms += '}}';
 
     if (lang !== ProjectML.language) {
         ProjectML.language = lang;
@@ -1109,7 +1249,8 @@ function set_pbx_options(e) {
 }
 
 (function(){
-    json_rpc_async('getPbxOptions', null, init);
+    // json_rpc_async('getPbxOptions', null, init);
+    init();
     createWebsocket();
     getTranslations();
 })();
